@@ -2,30 +2,28 @@
 # 
 src := $(shell find src -name "*.cpp")
 # 
-objs := $(src:.cpp=.o)
+build := $(src:.cpp=.o)
 # 
-objs := $(objs:src/%=objs/%)
+build := $(build:src/%=build/%)
 #
-objs/%.o : src/%.cpp
+build/%.o : src/%.cpp
 	@(echo compile $<, generate $@, path is $(dir $@))
 	@(mkdir -p $(dir $@))
-	g++ -c $< -o $@
+	g++ -c $< -o $@ -g -W
 # 
-workspace/pro : $(objs)
-	@(echo 这里的依赖项所有是[$^])
-	@(echo 链接$@)
-	g++ $^ -o $@
+debug/compiler: $(build)
+	@(mkdir debug)
+	@(echo depend [$^])
+	@(echo link $@)
+	g++ $^ -o $@ -g -W
 # 
-pro : workspace/pro
-	@(echo 编译完成)
+debug : debug/compiler
+	@(echo compiled)
 # 
-rum : pro
-	@(cd workspace && ./pro)
+run : debug
+	@(cd debug && ./compiler.exe)
 # 
 clean : 
-	rm -rf workspace/pro objs
+	(rm -rf debug build)
 # 
 .PHONY : pro run debug clean
-# 
-debug :
-	@(echo objs is[$(objs)])
