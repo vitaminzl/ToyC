@@ -8,7 +8,7 @@
 制作一个完整的编译器前端。 
 
 ## 编译器的结构
-![](https://imagehost.vitaminz-image.top/ToyC-1.png)  
+![](https://imagehost.vitaminz-image.top/ToyC-1.png)
 <center>图1：摘自《Compilers Principles, Techniques & Tools》第二版Figure 2.3</center>
 
 ### 词法分析器(Lexer)
