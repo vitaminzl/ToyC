@@ -8,7 +8,7 @@
 制作一个完整的编译器前端。 
 
 ## 编译器的结构
-![](http://imagehost.vitaminz-image.top/Cthon-1.png)
+<img src="http://imagehost.vitaminz-image.top/Cthon-1.png" style="zoom:50%;" />
 
 图1：摘自《Compilers Principles, Techniques & Tools》第二版Figure 2.3
 ### 词法分析器(Lexer)
@@ -29,5 +29,4 @@ Scan() {
 ### 
 
 ## 附录
-
 
