@@ -14,10 +14,16 @@
 ### 词法分析器(Lexer)
 词法分析器的步骤可用如下伪代码表示：
 ``` c
+cache = ' '
 Scan() {
-    skipBlankSpace(); // 跳过空白符
-    identifyNumber(); // 识别数字
-    
+    do{
+        if cache != 空格、换行、制表符
+            break;
+    }while(read(cache));
+
+    t = readKey(cache)     // 识别保留字
+    t = readNumber(cache); // 识别实数
+    t = 
 
     return t;
 }
