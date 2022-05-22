@@ -12,8 +12,37 @@
 <center>图1：摘自《Compilers Principles, Techniques & Tools》第二版Figure 2.3</center>
 
 ### 词法分析器(Lexer)
+#### 设计Token
+Token主要分为: 多字符保留字、标识符、数字以及其余单个字符。
+
+* 多字符保留字：
+  * 控制流语句：if, else, do, while, break
+  * 布尔运算：true, false, &&, ||
+  * 比较运算：>=, <=, ==, !=
+  * 变量类型：int, float, bool, char
+* 标识符：
+  * 正则表达式：[\_a-zA-Z\][\_a-zA-Z0-9]*
+* 数字：
+  * 整型正则表达式：[0-9]+
+  * 浮点型正则表达式：[0-9]+.[0-9]*
+* 其余单个字字符
+
+#### 设计类
+
+
+#### 识别算法
+
+
+
+#### 测试
+输入：字符串
+输出：按序输出token流，每个token占一行
+
+
 词法分析器的步骤可用如下伪代码表示：
 ``` c
+Input:  
+Output: 
 cache = ' '
 Scan() {
     do{
@@ -35,5 +64,4 @@ Scan() {
 ### 
 
 ## 附录
-
 
