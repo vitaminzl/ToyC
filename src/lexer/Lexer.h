@@ -5,6 +5,7 @@
 #include <map>
 using std::string;
 using std::map;
+
 /* 多字符保留字、标识符Tag编号 */
 enum Tag{
     IF = 256,   ELSE,       DO,         WHILE,  
@@ -47,8 +48,8 @@ public:
 class Number: public Token{
 public:
     const int value;                    // 整型的属性值
-    Integer(int i, int tag);            // 传入字符的属性以及编码
-    ~Integer();                         // 空白析构函数
+    Number(int i, int tag);            // 传入字符的属性以及编码
+    ~Number();                         // 空白析构函数
     virtual string toString() const;    // 将token转化为String类型    
 };
 
@@ -56,8 +57,8 @@ public:
 class Real: public Token{
 public:
     const float value;                  // 浮点型的属性值
-    Float(float f, int tag);            // 传入字符的属性以及编码
-    ~Float();                           // 空白析构函数
+    Real(float f, int tag);            // 传入字符的属性以及编码
+    ~Real();                           // 空白析构函数
     virtual string toString() const;    // 将token转化为String类型
 };
 /* 变量类型类 */
@@ -79,11 +80,7 @@ private:
 public:
     Lexer();
     ~Lexer();
-    int getLine() const;
-    int setLine(int l);
-    char getCache() const;
-    char setCache(char c);
     Token& scan();
-}
+};
 
 #endif
