@@ -5,7 +5,7 @@
 
 以及LLVM的编译器制作教程：https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl01.html
 
-制作一个完整的编译器前端。 
+制作一个完整的编译器前端。
 
 ## 编译器的结构
 ![](https://imagehost.vitaminz-image.top/ToyC-1.png)
@@ -27,12 +27,12 @@ Token主要分为: 多字符保留字、标识符、数字以及其余单个字�
   * 浮点型正则表达式：[0-9]+.[0-9]*
 * 其余单个字字符
 
-#### 设计类
-
 
 #### 识别算法
 
+```
 
+```
 
 #### 测试
 输入：字符串
@@ -58,10 +58,120 @@ Scan() {
 }
 ```
 
-### 语法分析器
+### 语法分析器(Parser)
+
+```c++
+PROGRAM -> BLOCK
+BLOCK 	-> '{' DECLS STMTS '}'
+DECLS 	-> DECLS DECL
+    	-> eps
+DECL 	-> TYPE id';'
+TYPE	-> TYPE '['	num ']'
+    	-> basic
+STMTS	-> STMTS STMT
+    	-> eps
+
+STMT	-> LOC = BOOL;
+		-> if ( BOOL ) STMT
+        -> if ( BOOL ) STMT else STMT
+        -> while ( BOOL ) STMT
+        -> do STMT while ( BOOL )
+        -> break';'
+        -> BLOCK
+LOC		-> LOC[ BOOL ] id
+            
+BOOL	-> BOOL '||' JOIN
+        -> JOIN
+JOIN	-> JOIN '&&' EQAULITY
+        -> EQUALITY
+EQUALITY-> EQUALITY '==' CMP
+        -> EQUALITY '!=' CMP
+        -> CMP
+CMP		-> EXPR < EXPR
+        -> EXPR <= EXPR
+        -> EXPR >= EXPR
+        -> EXPR > EXPR
+        -> EXPR
+EXPR	-> EXPR + TERM
+        -> EXPR - TERM
+        -> TERM
+TERM	-> TERM * UNARY
+        -> TERM / UNARY
+        -> UNARY
+UNARY	-> '!' UNARY
+        -> '-' UNARY
+        -> FACTOR
+FACTOR	-> ( BOOL )
+        -> LOC
+        -> number
+        -> real
+        -> true
+        -> false
+```
 
 
-### 
+
+### 符号表(Symbol Table)
+
+<img src="https://imagehost.vitaminz-image.top/ToyC-2.png" style="zoom:50%;" />
+
+<center>图2：符号表示意图</center>
+
+```c++
+PROGRAM -> {top = null;} BLOCK
+BLOCK -> '{' 
+		{ saved = top;				// 保留现场，saved
+		  top = new Scope(top); } 	// 碰到块建立符号表，top指向当前块符号表
+		DECLS DECL 
+		{ top = saved; }			// 恢复现场，
+		'}'
+DECLS -> DECLS DECL | eps
+DECL  -> TYPE id';' { s = new Symbol(id);			// 
+					  s.type = type.lexeme;
+					  top.put(id.lexeme, s); }
+TYPE  -> TYPE [num] | basic
+STMTS -> STMTS STMT | eps
+STMT  -> BLOCK
+STMT  -> .... > ... id { s = top.get(id.lexeme); } ....
+```
+
+
+
+
+
+```
+dims
+```
+
+
+
+### 中间代码(Intermediate Code)
+
+#### 表达式的计算
+
+
+
+#### 布尔表达式的跳转代码
+
+
+
+#### 语句的中间代码
+
+
+
+
+
+
+
+#### 总结
+
+
+
+
+
+
+
+
 
 ## 附录
 
