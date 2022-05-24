@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+using std::istream;
 using std::string;
 using std::map;
 
@@ -48,7 +49,7 @@ public:
 class Number: public Token{
 public:
     const int value;                    // 整型的属性值
-    Number(int i, int tag);            // 传入字符的属性以及编码
+    Number(string s, int tag);            // 传入字符的属性以及编码
     ~Number();                         // 空白析构函数
     virtual string toString() const;    // 将token转化为String类型    
 };
@@ -57,11 +58,11 @@ public:
 class Real: public Token{
 public:
     const float value;                  // 浮点型的属性值
-    Real(float f, int tag);            // 传入字符的属性以及编码
+    Real(string s, int tag);            // 传入字符的属性以及编码
     ~Real();                           // 空白析构函数
     virtual string toString() const;    // 将token转化为String类型
 };
-/* 变量类型类 */
+
 class Type: public Word{
 public:
     const int width;                    // 变量所占字节数
@@ -73,14 +74,28 @@ public:
     ~Type();                            // 空白析构函数
 };
 
+class Array: public Type{
+public:
+    Type type;
+    int size;
+    Array();
+    ~Array();
+    virtual string toString();
+};
+
 class Lexer{
 private:
     int line;
     char cache;
+    istream& input;
 public:
-    Lexer();
+    Lexer(istream& input);
     ~Lexer();
+    char readch();
+    bool readch(char c);
+    bool isEOF();
     Token& scan();
 };
+
 
 #endif

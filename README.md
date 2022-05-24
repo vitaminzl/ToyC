@@ -66,26 +66,29 @@ BLOCK 	-> '{' DECLS STMTS '}'
 DECLS 	-> DECLS DECL
     	-> eps
 DECL 	-> TYPE id';'
-TYPE	-> TYPE '['	num ']'
-    	-> basic
+TYPE	-> basic DIMS
+DIMS	-> '['DIMS']'
+		-> eps
 STMTS	-> STMTS STMT
     	-> eps
 
-STMT	-> LOC = BOOL;
+STMT	-> ASSIGN
 		-> if ( BOOL ) STMT
         -> if ( BOOL ) STMT else STMT
         -> while ( BOOL ) STMT
         -> do STMT while ( BOOL )
         -> break';'
         -> BLOCK
-LOC		-> LOC[ BOOL ] id
+ASSIGN  -> id OFFSET = BOOL;
+OFFSET  -> [ BOOL ]
+        -> eps
             
-BOOL	-> BOOL '||' JOIN
+BOOL	-> BOOL "||" JOIN
         -> JOIN
-JOIN	-> JOIN '&&' EQAULITY
+JOIN	-> JOIN "&&" EQAULITY
         -> EQUALITY
-EQUALITY-> EQUALITY '==' CMP
-        -> EQUALITY '!=' CMP
+EQUALITY-> EQUALITY "==" CMP
+        -> EQUALITY "!=" CMP
         -> CMP
 CMP		-> EXPR < EXPR
         -> EXPR <= EXPR
@@ -125,12 +128,19 @@ BLOCK -> '{'
 		DECLS DECL 
 		{ top = saved; }			// 恢复现场，
 		'}'
-DECLS -> DECLS DECL | eps
+DECLS -> DECLS DECL
+      -> eps
 DECL  -> TYPE id';' { s = new Symbol(id);			// 
-					  s.type = type.lexeme;
+					  s.type = TYPE.lexeme;
 					  top.put(id.lexeme, s); }
-TYPE  -> TYPE [num] | basic
-STMTS -> STMTS STMT | eps
+TYPE  -> basic {DIMS.type = basic; } 
+		 DIMS {TYPE.lexeme = DIMS.type; }
+DIMS  -> '['num']' DIMS { Array.sz = num * Array.sz;
+    					  DIMS.type = Array; }
+      -> eps { Array.sz = 1; 
+               Array.type = Dims.type; }
+STMTS -> STMTS STMT 
+      -> eps
 STMT  -> BLOCK
 STMT  -> .... > ... id { s = top.get(id.lexeme); } ....
 ```
@@ -139,8 +149,22 @@ STMT  -> .... > ... id { s = top.get(id.lexeme); } ....
 
 
 
-```
-dims
+单元测试：
+
+```c++
+PROGRAM -> BLOCK
+BLOCK 	-> '{' DECLS STMTS '}'
+DECLS 	-> DECLS DECL
+    	-> eps
+DECL 	-> TYPE id';'
+TYPE	-> basic DIMS
+DIMS	-> '['DIMS']'
+		-> eps
+STMTS	-> STMTS STMT
+    	-> eps
+STMT	-> BLOCK
+    	-> FACTOR ';'
+FACTOR	-> id
 ```
 
 
