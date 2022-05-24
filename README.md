@@ -11,7 +11,16 @@
 ![](https://imagehost.vitaminz-image.top/ToyC-1.png)
 <center>图1：摘自《Compilers Principles, Techniques & Tools》第二版Figure 2.3</center>
 
+### UML
+
+![](https://imagehost.vitaminz-image.top/UML.png)
+
+<center>图2：摘自《Compilers Principles, Techniques & Tools》第二版Figure 2.3</center>
+
+
+
 ### 词法分析器(Lexer)
+
 #### 设计Token
 Token主要分为: 多字符保留字、标识符、数字以及其余单个字符。
 
@@ -72,14 +81,14 @@ DIMS	-> '['DIMS']'
 STMTS	-> STMTS STMT
     	-> eps
 
-STMT	-> ASSIGN
+STMT	-> ASSIGN';'
 		-> if ( BOOL ) STMT
         -> if ( BOOL ) STMT else STMT
         -> while ( BOOL ) STMT
         -> do STMT while ( BOOL )
         -> break';'
         -> BLOCK
-ASSIGN  -> id OFFSET = BOOL;
+ASSIGN  -> id OFFSET = BOOL
 OFFSET  -> [ BOOL ]
         -> eps
             

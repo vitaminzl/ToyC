@@ -8,9 +8,9 @@ void testScan(){
     std::ifstream input("test.txt");
     Lexer lexer(input);
     while(!lexer.isEOF()){
-        Token& tok = lexer.scan();
-        cout << tok.tag << "    ";
-        cout << tok.toString() << endl;
+        Token* tok = lexer.scan();
+        cout << tok->tag << "    ";
+        cout << tok->toString() << endl;
     }
 }
 
