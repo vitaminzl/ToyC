@@ -1,0 +1,28 @@
+{
+    int a;
+    {
+        int b;
+        a;
+        b;
+    }
+    int c;
+    int[200] d;
+    {
+        char a;
+        {
+            bool a;
+            char e;
+            int[100][100] f;
+            a;
+            c;
+            d;
+            s;
+            f;
+            e;
+        }
+        int b;
+        e;
+    }
+    int f;
+    f;
+}
