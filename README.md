@@ -11,7 +11,16 @@
 ![](https://imagehost.vitaminz-image.top/ToyC-1.png)
 <center>图1：摘自《Compilers Principles, Techniques & Tools》第二版Figure 2.3</center>
 
+### UML
+
+![](https://imagehost.vitaminz-image.top/UML.png)
+
+<center>图2：UML</center>
+
+
+
 ### 词法分析器(Lexer)
+
 #### 设计Token
 Token主要分为: 多字符保留字、标识符、数字以及其余单个字符。
 
@@ -68,18 +77,18 @@ DECLS 	-> DECLS DECL
 DECL 	-> TYPE id';'
 TYPE	-> basic DIMS
 DIMS	-> '['DIMS']'
-		-> eps
+	-> eps
 STMTS	-> STMTS STMT
     	-> eps
 
-STMT	-> ASSIGN
-		-> if ( BOOL ) STMT
+STMT	-> ASSIGN';'
+	-> if ( BOOL ) STMT
         -> if ( BOOL ) STMT else STMT
         -> while ( BOOL ) STMT
         -> do STMT while ( BOOL )
         -> break';'
         -> BLOCK
-ASSIGN  -> id OFFSET = BOOL;
+ASSIGN  -> id OFFSET = BOOL
 OFFSET  -> [ BOOL ]
         -> eps
             
@@ -90,7 +99,7 @@ JOIN	-> JOIN "&&" EQAULITY
 EQUALITY-> EQUALITY "==" CMP
         -> EQUALITY "!=" CMP
         -> CMP
-CMP		-> EXPR < EXPR
+CMP	-> EXPR < EXPR
         -> EXPR <= EXPR
         -> EXPR >= EXPR
         -> EXPR > EXPR
@@ -172,20 +181,72 @@ FACTOR	-> id
 ### 中间代码(Intermediate Code)
 
 #### 表达式的计算
+<img src="https://imagehost.vitaminz-image.top/ToyC-3.png" style="zoom: 25%;" />
 
+<img src="https://imagehost.vitaminz-image.top/ToyC-5.png" 
+style="zoom: 25%;" />
 
+``` c++
+PROGRAM -> STMTS
+STMTS	-> STMTS STMT
+    	-> eps
+STMT	-> ASSIGN';'
+ASSIGN  -> id OFFSET = BOOL
+BOOL	-> BOOL "||" JOIN
+        -> JOIN
+JOIN	-> JOIN "&&" EQAULITY
+        -> EQUALITY
+EQUALITY-> EQUALITY "==" CMP
+        -> EQUALITY "!=" CMP
+        -> CMP
+CMP	-> EXPR < EXPR
+        -> EXPR <= EXPR
+        -> EXPR >= EXPR
+        -> EXPR > EXPR
+EXPR	-> EXPR + TERM
+        -> EXPR - TERM
+        -> TERM
+TERM	-> TERM * UNARY
+        -> TERM / UNARY
+        -> UNARY
+UNARY	-> '!' UNARY
+        -> '-' UNARY
+        -> FACTOR
+FACTOR	-> ( BOOL )
+        -> LOC
+        -> number
+        -> real
+```
 
-#### 布尔表达式的跳转代码
+#### 跳转语句的中间代码
+``` c++
+STMTS	-> STMTS STMT
+    	-> eps
 
+STMT	-> ASSIGN';'
+	-> if ( BOOL ) STMT
+        -> if ( BOOL ) STMT else STMT
+        -> while ( BOOL ) STMT
+        -> do STMT while ( BOOL )
+        -> break';'
+        -> BLOCK
+ASSIGN  -> id OFFSET = BOOL
+OFFSET  -> [ BOOL ]
+        -> eps
+            
+BOOL	-> BOOL "||" JOIN
+        -> JOIN
+JOIN	-> JOIN "&&" EQAULITY
+        -> EQUALITY
+EQUALITY-> EQUALITY "==" CMP
+        -> EQUALITY "!=" CMP
+        -> CMP
+CMP	-> EXPR < EXPR
+        -> EXPR <= EXPR
+        -> EXPR >= EXPR
+        -> EXPR > EXPR
 
-
-#### 语句的中间代码
-
-
-
-
-
-
+```
 
 #### 总结
 

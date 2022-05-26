@@ -12,8 +12,8 @@ enum Tag{
     IF = 256,   ELSE,       DO,         WHILE,  
     BREAK,      TRUE,       FALSE,      AND,
     OR,         NE,         EQ,         LE,
-    GE,         INT,        FLOAT,      BOOL,
-    CHAR
+    GE,         BASIC,      NUM,        REAL,
+    ID,         TEMP,       INDEX,      MINUS
 };
 
 /* Token基类 */
@@ -39,6 +39,16 @@ public:
 /* 多字符保留字以及标识符类 */
 class Word: public Token{
 public:
+    static const Word and;
+    static const Word or;
+    static const Word eq;
+    static const Word ne;
+    static const Word le;
+    static const Word ge;
+    static const Word minus;
+    static const Word True;
+    static const Word False;
+    static const Word temp;
     const string value;                 // 保留字及标识符的属性值
     Word(string s, int tag);            // 传入字符的属性以及编码
     ~Word();                            // 空白析构函数
@@ -87,6 +97,7 @@ class Lexer{
 private:
     int line;
     char cache;
+    map<string, Word> words;
     istream& input;
 public:
     Lexer(istream& input);
@@ -94,7 +105,7 @@ public:
     char readch();
     bool readch(char c);
     bool isEOF();
-    Token& scan();
+    Token* scan();
 };
 
 
