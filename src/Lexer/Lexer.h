@@ -59,7 +59,7 @@ public:
 class Number: public Token{
 public:
     const int value;                    // 整型的属性值
-    Number(string s, int tag);            // 传入字符的属性以及编码
+    Number(int s, int tag);            // 传入字符的属性以及编码
     ~Number();                         // 空白析构函数
     virtual string toString() const;    // 将token转化为String类型    
 };
@@ -68,7 +68,7 @@ public:
 class Real: public Token{
 public:
     const float value;                  // 浮点型的属性值
-    Real(string s, int tag);            // 传入字符的属性以及编码
+    Real(float s, int tag);            // 传入字符的属性以及编码
     ~Real();                           // 空白析构函数
     virtual string toString() const;    // 将token转化为String类型
 };
@@ -82,23 +82,31 @@ public:
     static const Type Char;             // 字符类型
     Type(string s, int tag, int width); // 传入字符的属性、编码以及所占空间大小
     ~Type();                            // 空白析构函数
+    bool isBool(Type t) const;          //判断是否是基本型（basic）
+    Type max(Type ta, Type tb) const;   //判断类型转换函数
 };
 
 class Array: public Type{
 public:
     Type type;
-    int size;
-    Array();
+    int size = 1;
+    Array(int sz,Type p);
     ~Array();
-    virtual string toString();
+    virtual string toString() const;
 };
 
 class Lexer{
 private:
+    //记录当前行号
     int line;
+    //缓冲区
     char cache;
+    //字符表
     map<string, Word> words;
     istream& input;
+    void reserve(Word w) {
+        words.insert(pair<string, Word>(w.value, w));
+    }
 public:
     Lexer(istream& input);
     ~Lexer();

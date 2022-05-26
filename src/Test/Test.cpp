@@ -5,7 +5,7 @@ using std::cout;
 using std::endl;
 
 void testScan(){
-    std::ifstream input("test.txt");
+    std::ifstream input("testScan.txt");
     Lexer lexer(input);
     while(!lexer.isEOF()){
         Token* tok = lexer.scan();
