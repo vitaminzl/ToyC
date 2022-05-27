@@ -2,17 +2,25 @@
 #define INTER
 #include "../Lexer/Lexer.h"
 #include <string>
+#include <iostream>
+// using namespace std;
+using std::ostream;
 using std::string;
+using std::cout;
+
+
 class Node{
 protected:
     int lexline = 0;
 public:
+    static ostream& output;
     static int labels;
+    static int newLabel();
     Node(){}
     Node(int);
     ~Node();
     void error(string s);
-    int newLabel();
+    void SetOutput(const ostream&);
     void printLabel(int)const;
     void print(string s)const;
 };
@@ -24,10 +32,10 @@ public:
     Expr(): op(nullptr), type(nullptr){}
     Expr(const Token*, const Type*);
     ~Expr(){}
-    void printJumps();
+    void printJumps(string, int, int)const;
     virtual const Expr* gen()const;
     virtual const Expr* reduce()const;
-    virtual void jump(int t, int f);
+    virtual void jump(int t, int f)const;
     virtual string toString()const;
 };
 
@@ -35,6 +43,7 @@ class Id: public Expr{
 private:
     int offset;
 public:
+    Id(const Word* id): Expr(id, &Type::Int), offset(0){}   // 模块调试使用
     Id(const Word* id, const Type* p, int b);
     int getOffset();
 };
@@ -66,9 +75,20 @@ public:
 
 class Arith: public Op{
 public:
-    Expr* expr1;
-    Expr* expr2;
+    const Expr* expr1;
+    const Expr* expr2;
+    Arith(const Token* , const Expr* , const Expr*);
     virtual const Expr* gen()const;
+    virtual string toString()const;
+};
+
+class Access: public Op{
+public:
+    const Id* array;
+    const Expr* index;
+    Access(const Id* , const Expr*, const Type* );
+    virtual const Expr* gen()const;
+    virtual void jump()const;
     virtual string toString()const;
 };
 
@@ -76,74 +96,83 @@ class Constant: public Expr{
 public:
     static const Constant True;
     static const Constant False;
-    Constant(Token* tok, Type* p);
+    Constant(const Token* tok, const Type* p);
     Constant(int i);
     ~Constant();
-    virtual void jump(int t, int f);
+    virtual void jump(int t, int f)const;
 };
 
 class Logical: public Constant{
 public:
-    Expr* expr1;
-    Expr* epxr2;
+    const Expr* expr1;
+    const Expr* expr2;
+    Logical(const Token* , const Expr* , const Expr* );
     virtual Type* check(Type* , Type* ){}
-    virtual Expr* gen();
-    virtual string toString();
+    virtual const Expr* gen()const;
+    virtual string toString()const;
 };
 
 class Or: public Logical{
 public:
-    virtual void jump(int t, int f);
+    Or(const Expr* , const Expr* );
+    virtual void jump(int t, int f)const;
 };
 
 class And: public Logical{
 public:
-    virtual void jump(int t, int f);
+    And(const Expr* , const Expr* );
+    virtual void jump(int t, int f)const;
 };
 
 class Not: public Logical{
 public:
-    virtual void jump(int t, int f);
-    virtual string toString();
+    Not(const Expr*);
+    virtual void jump(int t, int f)const;
+    virtual string toString()const;
 };
 
 class Cmp: public Logical{
 public:
+    Cmp(const Token* , const Expr* , const Expr* );
     virtual Type* check(Type*, Type*){}
-    virtual void jump(int t, int f);
+    virtual void jump(int t, int f)const;
 };
 
 
 class Stmt: public Node{
 public:
-    static Stmt* Null;
-    int after;
-    virtual Expr* gen(int b, int a);
+    static const Stmt Null;
+    Stmt(){}
+    int after = 0;
+    virtual const Expr* gen(int b, int a)const{}
 };
 
 class Set: public Stmt{
 public:
-    Id* id;
-    Expr* expr;
+    const Id* id;
+    const Expr* expr;
+    Set(const Id* ,const Expr* );
     virtual Type* check(Type*, Type*){}
-    virtual Expr* gen(int b, int a);
+    virtual const Expr* gen(int b, int a)const;
 };
 
 
 class SetElem: public Stmt{
 public:
-    Id* array;
-    Expr* index;
-    Expr* expr;
+    const Id* array;
+    const Expr* index;
+    const Expr* expr;
+    SetElem(const Id* , const Expr* , const Expr*);
     virtual Type* check(Type*, Type*){}
-    virtual Expr* gen(int b, int a);
+    virtual const Expr* gen(int b, int a)const;
 };
 
 class Seq: public Stmt{
 public:
     const Stmt* stmt1;
     const Stmt* stmt2;
-    virtual Expr* gen(int b, int a);
+    Seq(const Stmt* , const Stmt* );
+    virtual const Expr* gen(int b, int a)const;
 };
 
 

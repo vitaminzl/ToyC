@@ -89,7 +89,7 @@ STMT	-> ASSIGN';'
         -> break';'
         -> BLOCK
 ASSIGN  -> id OFFSET = BOOL
-OFFSET  -> [ BOOL ]
+OFFSET  -> [ BOOL ] OFFSET
         -> eps
             
 BOOL	-> BOOL "||" JOIN
@@ -114,7 +114,7 @@ UNARY	-> '!' UNARY
         -> '-' UNARY
         -> FACTOR
 FACTOR	-> ( BOOL )
-        -> LOC
+        -> id OFFSET
         -> number
         -> real
         -> true
@@ -192,6 +192,9 @@ STMTS	-> STMTS STMT
     	-> eps
 STMT	-> ASSIGN';'
 ASSIGN  -> id OFFSET = BOOL
+OFFSET  -> [ BOOL ] OFFSET
+        -> eps
+
 BOOL	-> BOOL "||" JOIN
         -> JOIN
 JOIN	-> JOIN "&&" EQAULITY
@@ -213,9 +216,12 @@ UNARY	-> '!' UNARY
         -> '-' UNARY
         -> FACTOR
 FACTOR	-> ( BOOL )
-        -> LOC
+        -> OFFSET
         -> number
         -> real
+        -> true
+        -> false
+        -> id OFFSET
 ```
 
 #### 跳转语句的中间代码
