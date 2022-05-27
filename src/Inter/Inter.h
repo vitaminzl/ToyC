@@ -55,13 +55,13 @@ public:
 /* 符号表 */
 class Scope: public Type{
 private:
-    map<Token, Id> table;
+    map<Token*, Id*> table;
     Scope* prev;
 public:
-    Scope();
+    Scope(Scope* n);
     ~Scope();
-    void put(Type* , Id*);
-    void get(Id*);
+    void put(Token* , Id*);
+    Id* get(Token*);
 };
 
 

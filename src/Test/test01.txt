@@ -1,9 +1,16 @@
 {
-    int i;
-    int j; 
-    int x; 
-    float v=4.5;
+	int i=1; 
+	int joker; 
+	int x1234k;
+	char c1;
+	float f=1.234;
     int a[100];
+
+	if(i!=2)
+		joker=1;
+	else
+		joker=0;
+
     while (true) {
         do 
             i = i + 1;

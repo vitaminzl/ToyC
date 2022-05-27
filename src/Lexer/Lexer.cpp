@@ -1,6 +1,7 @@
 #include "Lexer.h"
 #include <utility>
 #include <ctype.h>
+using namespace std;
 /* Token类的实现 */
 Token::Token(int t): tag(t){} 
 Token::~Token(){}
@@ -8,29 +9,47 @@ Token::~Token(){}
 /* Charactor类的实现 */
 Charactor::Charactor(char s, int t) : Token(t), value(s) {}
 Charactor::~Charactor() {}
+const Charactor Charactor:: AndS = Charactor('&', '&');
+const Charactor Charactor:: OrS = Charactor('|', '|');
+const Charactor Charactor:: Eq = Charactor('=', '=');
+const Charactor Charactor:: Not = Charactor('!', '!');
+const Charactor Charactor:: Lt = Charactor('<', '<');
+const Charactor Charactor:: Gt = Charactor('>', '>');
+const Charactor Charactor:: Opcurly = Charactor('{', '{');
+const Charactor Charactor:: Clcurly = Charactor('}', '}');
+const Charactor Charactor:: Semicolon = Charactor(';', ';');
+const Charactor Charactor::Opbracket = Charactor('[', '[');
+const Charactor Charactor::Clbracket = Charactor(']', ']');
+const Charactor Charactor::Opparenthese = Charactor('(', '(');
+const Charactor Charactor::Clparenthese = Charactor(')', ')');
+const Charactor Charactor::Add = Charactor('+', '+');
+const Charactor Charactor::Sub = Charactor('-', '-');
+const Charactor Charactor::Mul = Charactor('*', '*');
+const Charactor Charactor::Div = Charactor('/', '/');
 string Charactor::toString() const {
-    return std::to_string(value);
+    return (string("")+value);
 }
 
 /* Word类的实现 */
-Word::Word(string s, int t): Token(t), value(s){}
+Word::Word(string s, int t) : Token(t), value(s) {}
 Word::~Word(){}
-Word:: and = Word(string("&&"), Tag::AND);
-Word:: or = Word(string("||", Tag::OR));
-Word:: eq = Word(string("==", Tag::EQ));
-Word:: ne = Word(string("!=", Tag::NE));
-Word:: le = Word(string("<=", Tag::LE));
-Word:: ge = Word(string(">=", Tag::GE));
-Word:: minus = Word(string("-", Tag::MINUS));
-Word:: True = Word(string("true", Tag::TRUE));
-Word:: False = Word(string("false", Tag::FALSE));
-Word:: temp = Word(string("t", Tag::TEMP));
+const Word Word:: And = Word(string("&&"), Tag::AND);
+const Word Word:: Or = Word(string("||"), Tag::OR);
+const Word Word:: eq = Word(string("=="), Tag::EQ);
+const Word Word:: ne = Word(string("!="), Tag::NE);
+const Word Word:: le = Word(string("<="), Tag::LE);
+const Word Word:: ge = Word(string(">="), Tag::GE);
+const Word Word:: minus = Word(string("-"), Tag::MINUS);
+const Word Word:: True = Word(string("true"), Tag::TRUE);
+const Word Word:: False = Word(string("false"), Tag::FALSE);
+const Word Word:: temp = Word(string("t"), Tag::TEMP);
+const Word Word:: err = Word(string("error"), Tag::ERR);
 string Word::toString() const{
     return value;
 }
 
 /* Number类的实现 */
-Number::Number(int s, int t) : Token(t), value(s) {}
+Number::Number(int s=0, int t=Tag::NUM) : Token(t), value(s) {}
 Number::~Number() {}
 string Number::toString() const {
     return std::to_string(value);
@@ -46,57 +65,58 @@ string Real::toString() const {
 /* Type类的实现 */
 Type::Type(string s, int t,int w) : Word(s,t), width(w) {}
 Type::~Type() {}
-Type::Int = Type(string("int"), Tag::BASIC, 4);
-Type::Float = Type(string("float"), Tag::BASIC, 4);
-Type::Bool = Type(string("bool"), Tag::BASIC, 1);
-Type::Char = Type(string("char"), Tag::BASIC, 1);
+const Type Type::Int = Type(string("int"), Tag::BASIC, 4);
+const Type Type::Float = Type(string("float"), Tag::BASIC, 4);
+const Type Type::Bool = Type(string("bool"), Tag::BASIC, 1);
+const Type Type::Char = Type(string("char"), Tag::BASIC, 1);
 //函数：判断是否是基本型
-bool Type::isBool(Type t) const{
-    if (t == Type::Int || t == Type::Float || t == Type::Bool || t == Type::Char)
+bool Type::isBool(Type* t) const{
+    if (t == &Type::Int || t == &Type::Float || t == &Type::Bool || t == &Type::Char)
         return true;
     else
         return false;
 }
 //函数：判断转换成的类型
-Type Type::max(Type ta, Type tb) const {
+const Type* Type::max(Type* ta, Type* tb) const {
     if (!isBool(ta) || !isBool(tb))
-        return null;
-    else if (ta == Type::Float || tb == Type::Float)
-        return Type::Float;
-    else if (ta == Type::Int || tb == Type::Int)
-        return Type::Int;
+        return nullptr;
+    else if (ta == &Type::Float || tb == &Type::Float)
+        return &Type::Float;
+    else if (ta == &Type::Int || tb == &Type::Int)
+        return &Type::Int;
     else
-        return Type::Char;
+        return &Type::Char;
+}
+string Type::toString() const {
+    return value;
 }
 
 /* Array类的实现 */
-Array::Array(int se,Type p) : Type(string(""), Tag::INDEX, sz*p.width), size(sz),type(p) {}
+Array::Array(int sz,Type p) : Type(string(""), Tag::INDEX, sz*p.width), size(sz),type(p) {}
 Array::~Array() {}
 string Array::toString() const {
-    return (string"["+std::to_string(size)+string"]"+type.tostring());
+    return (string("[")+std::to_string(size)+string("]")+type.toString());
 }
 
 /* Lexer类的实现 */
-Lexer::Lexer(istream& in) {
-    reserve(Word::and);
-    reserve(Word::or);
-    reserve(Word::eq);
-    reserve(Word::ne);
-    reserve(Word::le);
-    reserve(Word::ge);
-    reserve(Word::minus);
-    reserve(Word::True);
-    reserve(Word::False);
-    reserve(Word::temp);
-    reserve(Type::Int);
-    reserve(Type::Float);
-    reserve(Type::Bool);
-    reserve(Type::Char);
-    input = in;
+Lexer::Lexer(istream& in):input(in) {
+    reserve(new Word("if", Tag::IF));
+    reserve(new Word("else", Tag::ELSE));
+    reserve(new Word("while", Tag::WHILE));
+    reserve(new Word("do", Tag::DO));
+    reserve(new Word("break", Tag::BREAK));
+    reserve(&Word::True);
+    reserve(&Word::False);
+    reserve(&Type::Int);
+    reserve(&Type::Char);
+    reserve(&Type::Bool);
+    reserve(&Type::Float);
 }
 Lexer::~Lexer(){}
-char Lexer::readch() {
-    cache = input.get();
+char* Lexer::readch() {
+    cache=input.get();
+    //cout << "cache:" << cache << endl;
+    return &cache;
 }
 bool Lexer::readch(char c) {
     readch();
@@ -106,13 +126,13 @@ bool Lexer::readch(char c) {
     return true;
 }
 bool Lexer::isEOF() {
-    if (input.peek() == EOF)
+    if (input.eof())
         return true;
     else
         return false;
 }
-Token* Lexer::scan() {
-    for (;; readch) {
+const Token* Lexer::scan() {
+    for (;; readch()) {
         if (cache == ' ' || cache == '\t')
             continue;
         else if (cache == '\n')
@@ -120,69 +140,99 @@ Token* Lexer::scan() {
         else
             break;
     }
+    //cout << cache << endl;
     switch (cache) {
     case '&':
         if (readch('&'))
-            return Word::and;
+            return &Word::And;
         else {
-            Token* t = new Token('&');
-            return t;
+            return &Charactor::AndS;
         }
     case '|':
         if (readch('|'))
-            return Word:: or ;
+            return &Word::Or;
         else {
-            Token* t = new Token('|');
-            return t;
+            return &Charactor::OrS;
         }
     case '=':
         if (readch('='))
-            return Word::eq;
+            return &Word::eq;
         else {
-            Token* t = new Token('=');
-            return t;
+            return &Charactor::Eq;
         }
     case '!':
         if (readch('='))
-            return Word::ne;
+            return &Word::ne;
         else {
-            Token* t = new Token('!');
-            return t;
+            return &Charactor::Not;
         }
     case '<':
         if (readch('='))
-            return Word::le;
+            return &Word::le;
         else {
-            Token* t = new Token('<');
-            return t;
+            return &Charactor::Lt;
         }
     case '>':
         if (readch('='))
-            return Word::ge;
+            return &Word::ge;
         else {
-            Token* t = new Token('>');
-            return t;
+            return &Charactor::Gt;
         }
+    case '{':
+        readch();
+        return &Charactor::Opcurly;
+    case '}':
+        readch();
+        return &Charactor::Clcurly;
+    case '[':
+        readch();
+        return &Charactor::Opbracket;
+    case ']':
+        readch();
+        return &Charactor::Clbracket;
+    case '(':
+        readch();
+        return &Charactor::Opparenthese;
+    case ')':
+        readch();
+        return &Charactor::Clparenthese;
+    case ';':
+        readch();
+        return &Charactor::Semicolon;
+    case '+':
+        readch();
+        return &Charactor::Add;
+    case '-':
+        readch();
+        return &Charactor::Sub;
+    case '*':
+        readch();
+        return &Charactor::Mul;
+    case '/':
+        readch();
+        return &Charactor::Div;
     }
     if (std::isdigit(cache)) {
-        Number* v(0);
+        int v = 0;
         do {
-            v->value = 10 * v->value + (int)cache;
+            v = 10 * v + (int)cache - 48;
             readch();
         } while (std::isdigit(cache));
+        Number* num = new Number(v, Tag::NUM);
         if (cache != '.')
-            return v;
+            return num;
         else {
-            Real* x(v->value);
+            float x = v;
             float d = 10;
             for (;;) {
                 readch();
                 if (!std::isdigit(cache))
                     break;
-                x->value = x->value + (int)cache / d;
-                d = d * 1 0;
+                x = x + ((int)cache-48) / d;
+                d = d * 10;
             }
-            return x;
+            Real* re = new Real(x, Tag::REAL);
+            return re;
         }
     }
     if (std::isalpha(cache)) {
@@ -191,11 +241,16 @@ Token* Lexer::scan() {
             b += cache;
             readch();
         } while (std::isalpha(cache) || std::isdigit(cache));
-        Word w = (Word)words.get(d);
-        if (w != null)
+        if (words.count(b)) {
+            const Word * w = words[b];
             return w;
-        Word* nw = Word(b, Tag::ID);
-        words.insert(pair<string, Word>(nw.value, nw));
-        return nw;
+        }
+        else {
+            const Word* nw = new Word(b, Tag::ID);
+            words.insert(std::pair<string, const Word*>(nw->value, nw));
+            return nw;
+        }
     }
+    readch();
+    return &Word::err;
 }
