@@ -12,8 +12,6 @@ int Node::labels = 0;
 
 Node::Node(int l): lexline(l){}
 
-Node::~Node(){}
-
 /* 输出错误信息并换行 */
 void Node::error(string s){
     cout << s << endl;
@@ -127,6 +125,10 @@ const Expr* Unary::gen()const{
     return new Unary(op, expr->reduce());
 }
 
+string Unary::toString()const{
+    return op->toString() + expr->toString();
+}
+
 /* --------------- 双目运算 ----------------*/
 
 Arith::Arith(const Token* t, const Expr* e1, const Expr* e2): 
@@ -165,6 +167,7 @@ string Access::toString()const{
 /* ------------- Constant的实现 ------------ */
 
 const Constant Constant::True = Constant(&Word::True, &Type::Bool);
+const Constant Constant::False = Constant(&Word::False, &Type::Bool);
 
 Constant::Constant(const Token* tok, const Type* ty): Expr(tok, ty){}
 
@@ -226,6 +229,10 @@ Not::Not(const Expr* e): Logical(&Word::And, e, nullptr){}
 
 void Not::jump(int t, int f)const{
     expr1->jump(f, t);
+}
+
+string Not::toString()const{
+    return op->toString() + expr1->toString();
 }
 
 /* --------------------- Cmp的实现 ----------------------- */

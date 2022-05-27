@@ -1,19 +1,12 @@
-// #include "Test.h"
-// #include <fstream>
-// #include <iostream>
-// using std::cout;
-// using std::endl;
+#include "Test.h"
+#include <fstream>
+#include <iostream>
+using namespace std;
 
-// void testScan(){
-//     std::ifstream input("test.txt");
-//     Lexer lexer(input);
-//     while(!lexer.isEOF()){
-//         Token* tok = lexer.scan();
-//         cout << tok->tag << "    ";
-//         cout << tok->toString() << endl;
-//     }
-// }
 
-// void testSymbol(){
-    
-// }
+void Test::testExpr() {
+    ifstream input("D:\\ZJUT\\Compilers Principles\\Make a Simple Compiler\\code\\src\\Test\\testExpr1.txt");
+    Lexer lexer(input);
+    Parser parser(lexer);
+    parser.program();
+}

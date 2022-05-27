@@ -36,8 +36,7 @@ Parser::Parser(Lexer& l):lex(l){
 }
 
 void Parser::error(string s){ 
-    cerr << "near Line" << lex.getLine() << ": "<< s << endl; 
-    exit(1);
+    throw string("near Line") + to_string(lex.getLine()) + s; 
 }
 
 void Parser::move(){
@@ -119,7 +118,7 @@ const Access* Parser::offset(const Id* id){
 */
 const Expr* Parser::bools(){
     const Expr* first = join();
-    if (lookahead->tag == Tag::OR){
+    while (lookahead->tag == Tag::OR){
         move();
         const Expr* second = join();
         first = new Or(first, second);
@@ -133,7 +132,7 @@ const Expr* Parser::bools(){
 */
 const Expr* Parser::join(){
     const Expr* first = equality();
-    if (lookahead->tag == Tag::AND){
+    while (lookahead->tag == Tag::AND){
         move();
         const Expr* second = equality();
         first = new And(first, second);
@@ -149,7 +148,7 @@ const Expr* Parser::join(){
 */
 const Expr* Parser::equality(){
     const Expr* first = cmp();
-    if (lookahead->tag == Tag::EQ || lookahead->tag == Tag::NE){
+    while (lookahead->tag == Tag::EQ || lookahead->tag == Tag::NE){
         const Token* oper = lookahead;
         move();
         const Expr* second = cmp();
@@ -167,14 +166,16 @@ const Expr* Parser::equality(){
 */
 const Expr* Parser::cmp(){
     const Expr* first = expr();
+    const Token* oper = nullptr;
+    const Expr* second = nullptr;
     switch(lookahead->tag){
         case '<':
         case '>':
         case Tag::LE:
         case Tag::GE:
-            const Token* oper = lookahead; 
+            oper = lookahead; 
             move();
-            const Expr* second = expr();
+            second = expr();
             first = new Cmp(oper, first, second);
             break;
         default:
@@ -192,7 +193,7 @@ const Expr* Parser::cmp(){
 const Expr* Parser::expr(){
     const Expr* first = term();
     const Token* oper = lookahead;
-    if (lookahead->tag == '+' || lookahead->tag == '-'){
+    while (lookahead->tag == '+' || lookahead->tag == '-'){
         const Token* oper = lookahead;
         move();
         const Expr* second = term();
@@ -203,14 +204,14 @@ const Expr* Parser::expr(){
 
 
 /* 
-    EXPR -> EXPR + UNARY
-         -> EXPR - UNARY
+    TERM -> TERM * UNARY
+         -> TERM / UNARY
          -> UNARY
 */
 const Expr* Parser::term(){
     const Expr* first = unary();
     const Token* oper = lookahead;
-    if (lookahead->tag == '*' || lookahead->tag == '/'){
+    while (lookahead->tag == '*' || lookahead->tag == '/'){
         const Token* oper = lookahead;
         move();
         const Expr* second = unary();
@@ -223,17 +224,19 @@ const Expr* Parser::term(){
 /*
     UNARY -> ! UNARY
           -> - UNARY
-          -> UNARY
+          -> Factor
 */
-const Expr* Parser::term(){
-    if (lookahead->tag == '!' || lookahead->tag == '-'){
+const Expr* Parser::unary(){
+    if (lookahead->tag == '!' ){
+        move();
+        return new Not(unary());
+    }
+    else if (lookahead->tag == '-'){
         const Token* oper = lookahead;
         move();
-        return new Unary(oper, factor());
+        return new Unary(oper, unary());        
     }
-    else{
-        return factor();
-    }
+    return factor();
 }
 
 /*
@@ -246,21 +249,30 @@ const Expr* Parser::term(){
 */
 const Expr* Parser::factor(){
     switch (lookahead->tag) {
-    case '(':
+    case '(': {
         move();
         const Expr* b = bools(); 
         match(')');
         return b;
-    case Tag::ID:
+        }
+    case Tag::ID: {
         const Id* id = new Id((Word*)lookahead);
         move();
-        return offset(id);
-    case Tag::NUM:
+        if(lookahead->tag == '[')
+            return offset(id);
+        else 
+            return id;
+        }
+    case Tag::NUM:{
+        const Token* num = lookahead;
         move();
-        return new Constant(lookahead, &Type::Int);
-    case Tag::REAL:
+        return new Constant(num, &Type::Int);
+        }
+    case Tag::REAL:{
+        const Token* real = lookahead;
         move();
-        return new Constant(lookahead, &Type::Float);
+        return new Constant(real, &Type::Float);
+        }
     case Tag::TRUE:
         move();
         return &Constant::True;

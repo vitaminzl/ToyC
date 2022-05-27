@@ -18,7 +18,7 @@ public:
     static int newLabel();
     Node(){}
     Node(int);
-    ~Node();
+    ~Node(){}
     void error(string s);
     void SetOutput(const ostream&);
     void printLabel(int)const;
@@ -61,7 +61,7 @@ public:
 class Op: public Expr{
 public:
     Op(){}
-    Op(const Token* , const Type* ){}
+    Op(const Token* , const Type* );
     virtual const Expr* reduce()const;
 };
 
@@ -98,7 +98,7 @@ public:
     static const Constant False;
     Constant(const Token* tok, const Type* p);
     Constant(int i);
-    ~Constant();
+    ~Constant(){}
     virtual void jump(int t, int f)const;
 };
 

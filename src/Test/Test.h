@@ -6,10 +6,10 @@
 
 class Test{
 public:
-    void testScan();
-    void testSymbol();
-    void testExpr();
-    void testJumps();
+    static void testScan(){}
+    static void testSymbol(){}
+    static void testExpr();
+    static void testJumps();
 };
 
 
