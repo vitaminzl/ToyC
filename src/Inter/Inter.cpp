@@ -291,11 +291,10 @@ const Stmt Stmt::Null = Stmt();
 
 Set::Set(const Id* i, const Expr* e): id(i), expr(e){}
 
-const Expr* Set::gen(int b, int a)const{
+void Set::gen(int b, int a)const{
     const Expr* e = expr->gen();
     print(id->toString() + string(" = ") + e->toString());
     delete e;
-    return id;
 }
 
 /* ---------------------- SetElem的实现 -------------------------- */
@@ -304,13 +303,12 @@ SetElem::SetElem(const Id* i, const Expr* e1, const Expr* e2):
 array(i), index(e1), expr(e2){}
 
 
-const Expr* SetElem::gen(int b, int a)const {
+void SetElem::gen(int b, int a)const {
     const Expr* ix = index->reduce();
     const Expr* ex = expr->reduce();
     print(array->toString() + string("[") + ix->toString() + string("] = ") + ex->toString());
     delete ix;
     delete ex;
-    return array;
 }
 
 
@@ -319,7 +317,7 @@ const Expr* SetElem::gen(int b, int a)const {
 Seq::Seq(const Stmt* s1, const Stmt* s2): stmt1(s1), stmt2(s2){}
 
 /* 一个语句块生成一个Label */
-const Expr* Seq::gen(int b, int a)const{
+void Seq::gen(int b, int a)const{
     if (stmt1 == &Stmt::Null) 
         stmt2->gen(b, a);
     else if (stmt2 == &Stmt::Null)
@@ -330,5 +328,91 @@ const Expr* Seq::gen(int b, int a)const{
         printLabel(label);
         stmt2->gen(label, a);
     }
+}
+
+/* --------------------- If的实现 ---------------------- */
+
+If::If(const Expr* e, const Stmt* s): expr(e), stmt(s){
+    if (!Type::isBool(e->type))
+        error("Need Bool in If");
+}
+
+
+/*  对于If的代码生成来说，b和a表示入口和出口
+    先对表达式进行短路性跳转 
+    begin:  If False expr goto Label2    
+    Label1: Stmt(entry: Label1, exit: after)
+*/
+void If::gen(int begin, int after)const{
+    int label = newLabel();
+    expr->jump(0, label);
+    printLabel(label);
+    stmt->gen(label, after);
+}
+
+/* --------------------- Else的实现 ------------------------ */
+
+Else::Else(const Expr* e, const Stmt* s1, const Stmt* s2):
+expr(e), stmt1(s1), stmt2(s2){
+    if (!Type::isBool(e->type))
+        error("Need Bool in IF-Else");
+}
+
+
+/*  begin:  If False expr goto label2    
+    label1: Stmt(entry: label1, exit: label2)
+    label2: Stmt(entry: label2, exit: after)
+*/
+void Else::gen(int begin, int after)const{
+    int label1 = newLabel();
+    int label2 = newLabel();
+    expr->jump(0, label2);
+    printLabel(label1);
+    stmt1->gen(label1, label2);
+    printLabel(label2);
+    stmt2->gen(label2, after);
+}
+
+
+/* -------------------- While的实现 ----------------------- */
+
+void While::init(const Expr* e, const Stmt* s){
+    if (!Type::isBool(e->type))
+        error("Need Bool in While");
+    expr = e;
+    stmt = s;
+}
+
+/*  begin:  If expr goto label  else goto after
+    label:  Stmt(entry: label, exit: begin)
+    ------------
+    begin:  If False expr goto after
+    label:  Stmt(entry: label, exit: begin)
+            goto label
+*/
+void While::gen(int begin, int after)const{
+    int label = newLabel();
+    expr->jump(label, after);
+    printLabel(label);
+    stmt->gen(label, begin);
+}
+
+/* ------------------- Do的实现 ---------------------- */
+
+void Do::init(const Expr* e, const Stmt* s){
+    if (!Type::isBool(e->type))
+        error("Need Bool in While");
+    expr = e;
+    stmt = s;
+}
+
+/*  begin:  Stmt(entry: begin, exit: label)
+    label:  if expr goto begin else goto after
+*/
+void Do::gen(int begin, int after)const{
+    int label = newLabel();
+    stmt->gen(begin, label);
+    printLabel(label);
+    expr->jump(begin, after);
 }
 

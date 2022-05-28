@@ -101,8 +101,8 @@ public:
     static const Type Char;             // 字符类型
     Type(string s, int tag, int width); // 传入字符的属性、编码以及所占空间大小
     ~Type();                            // 空白析构函数
-    bool isBool(Type* t) const;          //判断是否是基本型（basic）
-    const Type* max(Type* ta, Type* tb) const;   //判断类型转换函数
+    static bool isBool(const Type* t);          //判断是否是基本型（basic）
+    static const Type* max(const Type* ta, const Type* tb);   //判断类型转换函数
     virtual string toString() const;     // 将token转化为String类型
 };
 

@@ -241,6 +241,77 @@ b = (a + c) > (b * 2 - 1) || a < b && c;
 输出
 
 ``` txt 
+	a = b + 1
+L3:	t1 = 32 * 43
+	t2 = a + t1
+	t3 = g - 2
+	t4 = b / t3
+	c = t2 - t4
+L4:	d = e + f
+L5:	t5 = 3 * 10
+	t6 = e[t5]
+	c = -t6
+L6:	t7 = 33 + 34
+	t8 = sd3 * c
+	t9 = t7 + t8
+	t10 = t9 * 10
+	t11 = c[t10]
+	t12 = de * c
+	t13 = t12 + c2
+	c[t11] = t13
+L7:	t14 = 2 * d
+	t15 = t14 * 10
+	t16 = c[t15]
+	t17 = t16 + 4
+	t18 = t17 * 10
+	t19 = f[t18]
+	t20 = f * 10
+	t21 = s[t20]
+	t22 = 23 - t21
+	t23 = t22 * 10
+	t24 = de[t23]
+	t25 = df + t24
+	f[t19] = t25
+L8:	t26 = m * 10
+	t27 = n * 10
+	t28 = t26 + t27
+	t29 = o * 10
+	t30 = t28 + t29
+	t31 = s[t30]
+	t32 = 3 * 10
+	t33 = x * 10
+	t34 = t32 + t33
+	t35 = d[t34]
+	t36 = -t35
+	s[t31] = t36
+L9:	if False a goto L13
+	t37 = 23 * 10
+	t38 = f * 10
+	t39 = t37 + t38
+	t40 = sp[t39]
+	if False t40 goto L14
+	if c goto L13
+	if d goto L13
+	goto L14
+L14:	if f goto L11
+	if kk goto L13
+	goto L11
+L13:	t41 = true
+	goto L12
+L11:	t41 = false
+L12:	a = t41
+L10:	t42 = a + c
+	t43 = b * 2
+	t44 = t43 - 1
+	if t42 > t44 goto L17
+	if False a < b goto L15
+	if c goto L17
+	goto L15
+L17:	t45 = true
+	goto L16
+L15:	t45 = false
+L16:	b = t45
+L2:
 
 ```
 
@@ -248,6 +319,8 @@ b = (a + c) > (b * 2 - 1) || a < b && c;
 
 #### 跳转语句的中间代码
 ``` c++
+PROGRAM -> BLOCK
+BLOCK 	-> '{' STMTS '}'
 STMTS	-> STMTS STMT
     	-> eps
 

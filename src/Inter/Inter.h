@@ -150,7 +150,7 @@ public:
     static const Stmt Null;
     Stmt(){}
     int after = 0;
-    virtual const Expr* gen(int b, int a)const{}
+    virtual void gen(int b, int a)const{}
 };
 
 class Set: public Stmt{
@@ -159,7 +159,7 @@ public:
     const Expr* expr;
     Set(const Id* ,const Expr* );
     virtual Type* check(Type*, Type*){}
-    virtual const Expr* gen(int b, int a)const;
+    virtual void gen(int b, int a)const;
 };
 
 
@@ -170,7 +170,7 @@ public:
     const Expr* expr;
     SetElem(const Id* , const Expr* , const Expr*);
     virtual Type* check(Type*, Type*){}
-    virtual const Expr* gen(int b, int a)const;
+    virtual void gen(int b, int a)const;
 };
 
 class Seq: public Stmt{
@@ -178,9 +178,50 @@ public:
     const Stmt* stmt1;
     const Stmt* stmt2;
     Seq(const Stmt* , const Stmt* );
-    virtual const Expr* gen(int b, int a)const;
+    virtual void gen(int b, int a)const;
 };
 
+class If: public Stmt{
+public:
+    const Expr* expr;
+    const Stmt* stmt;
+    If(const Expr* , const Stmt* );
+    virtual void gen(int b, int a)const;
+};
+
+class Else: public Stmt{
+public:
+    const Expr* expr;
+    const Stmt* stmt1;
+    const Stmt* stmt2;
+    Else(const Expr* , const Stmt* , const Stmt* );
+    virtual void gen(int b, int a)const;
+};
+
+class While: public Stmt{
+public:
+    const Expr* expr;
+    const Stmt* stmt;
+    While():expr(nullptr), stmt(nullptr){}
+    void init(const Expr* , const Stmt*);
+    virtual void gen(int b, int a)const;
+};
+
+class Do: public Stmt{
+public:
+    const Expr* expr;
+    const Stmt* stmt;
+    Do(): expr(nullptr), stmt(nullptr){}
+    void init(const Expr* , const Stmt* );
+    virtual void gen(int b, int a)const;
+};
+
+class Break: public Stmt{
+public:
+    const Stmt* stmt;
+    Break(const Stmt* );
+    virtual void gen(int b, int a);
+};
 
 /* 符号表 */
 // class Scope: public Type{

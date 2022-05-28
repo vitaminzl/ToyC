@@ -70,14 +70,14 @@ const Type Type::Float = Type(string("float"), Tag::BASIC, 4);
 const Type Type::Bool = Type(string("bool"), Tag::BASIC, 1);
 const Type Type::Char = Type(string("char"), Tag::BASIC, 1);
 //函数：判断是否是基本型
-bool Type::isBool(Type* t) const{
+bool Type::isBool(const Type* t){
     if (t == &Type::Int || t == &Type::Float || t == &Type::Char)
         return false;
     else
         return true;
 }
 //函数：判断转换成的类型
-const Type* Type::max(Type* ta, Type* tb) const {
+const Type* Type::max(const Type* ta, const Type* tb){
     if (isBool(ta) || isBool(tb))
         return nullptr;
     else if (ta == &Type::Float || tb == &Type::Float)
