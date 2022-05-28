@@ -9,7 +9,7 @@ public:
     static void testScan(){}
     static void testSymbol(){}
     static void testExpr();
-    static void testJumps();
+    static void testControls();
 };
 
 

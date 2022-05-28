@@ -9,8 +9,9 @@ class Parser{
 private:
     Lexer& lex;
     const Token* lookahead;
+    ostream& output;
 public:
-    Parser(Lexer& lex);
+    Parser(Lexer& lex, ostream&);
     ~Parser(){}
     void error(string s);
     void move();

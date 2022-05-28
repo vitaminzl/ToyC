@@ -8,21 +8,27 @@ using std::ostream;
 using std::string;
 using std::cout;
 
+class Print{
+public: 
+    ostream& output;
+    Print():output(cout) {}
+    Print(ostream& o):output(o) {}
+};
 
 class Node{
 protected:
     int lexline = 0;
-public:
-    static ostream& output;
+    static Print* p;
     static int labels;
-    static int newLabel();
+public:
     Node(){}
     Node(int);
     ~Node(){}
-    void error(string s);
-    void SetOutput(const ostream&);
-    void printLabel(int)const;
-    void print(string s)const;
+    static int newLabel();
+    static void error(string s);
+    static void setOutput(ostream& o);
+    static void printLabel(int);
+    static void print(string s);
 };
 
 class Expr: public Node{
@@ -88,7 +94,7 @@ public:
     const Expr* index;
     Access(const Id* , const Expr*, const Type* );
     virtual const Expr* gen()const;
-    virtual void jump()const;
+    virtual void jump(int t, int f)const;
     virtual string toString()const;
 };
 

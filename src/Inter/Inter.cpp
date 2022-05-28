@@ -1,16 +1,25 @@
 #include "Inter.h"
 #include <iostream>
+#include <fstream>
 #include <string>
 using std::string;
 using std::to_string;
 using std::cout;
 using std::endl;
+using std::ofstream;
 /* ----------- Node实现部分 ------------ */
 
 /* 初始化标号为0 */
 int Node::labels = 0;
 
+Print* Node::p = new Print(cout);
+
 Node::Node(int l): lexline(l){}
+
+void Node::setOutput(ostream& o){
+    delete p;
+    p = new Print(o);
+}
 
 /* 输出错误信息并换行 */
 void Node::error(string s){
@@ -23,16 +32,14 @@ int Node::newLabel(){
 }
 
 /* 输出标号 */
-void Node::printLabel(int l)const{
-    output << "L" << l << ":";
+void Node::printLabel(int l){
+    p->output << "L" << l << ":";
 }
 
 /* 打印字符串并换行 */
-void Node::print(string s)const{
-    output << "\t" << s << endl;
+void Node::print(string s){
+    p->output << "\t" << s << endl;
 } 
-
-ostream& Node::output = cout;
 
 /* -------------- Expr实现部分 ---------------*/
 
@@ -156,8 +163,11 @@ const Expr* Access::gen()const{
     return new Access(array, index->reduce(), type);
 }
 
-void Access::jump()const{
-
+void Access::jump(int t, int f)const{
+    const Expr* e = this->reduce();
+    string s = e->toString();
+    delete e;
+    printJumps(s, t, f);
 }
 
 string Access::toString()const{
@@ -267,6 +277,8 @@ void Cmp::jump(int t, int f)const {
     const Expr* e1 = expr1->reduce();
     const Expr* e2 = expr2->reduce();
     string s = e1->toString() + " " + op->toString() + " " + e2->toString();
+    delete e1;
+    delete e2;
     printJumps(s, t, f);
 }
 
@@ -282,6 +294,7 @@ Set::Set(const Id* i, const Expr* e): id(i), expr(e){}
 const Expr* Set::gen(int b, int a)const{
     const Expr* e = expr->gen();
     print(id->toString() + string(" = ") + e->toString());
+    delete e;
     return id;
 }
 
@@ -295,6 +308,8 @@ const Expr* SetElem::gen(int b, int a)const {
     const Expr* ix = index->reduce();
     const Expr* ex = expr->reduce();
     print(array->toString() + string("[") + ix->toString() + string("] = ") + ex->toString());
+    delete ix;
+    delete ex;
     return array;
 }
 

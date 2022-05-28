@@ -5,8 +5,9 @@ using namespace std;
 
 
 void Test::testExpr() {
-    ifstream input("D:\\ZJUT\\Compilers Principles\\Make a Simple Compiler\\code\\src\\Test\\testExpr.txt");
+    ifstream input("testExpr.txt");
+    ofstream output("testExpr-intercode.txt");
     Lexer lexer(input);
-    Parser parser(lexer);
+    Parser parser(lexer, output);
     parser.program();
 }

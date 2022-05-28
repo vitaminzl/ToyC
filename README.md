@@ -165,10 +165,10 @@ PROGRAM -> BLOCK
 BLOCK 	-> '{' DECLS STMTS '}'
 DECLS 	-> DECLS DECL
     	-> eps
-DECL 	-> TYPE id';'
+DECL 	-> TYPE id ';'
 TYPE	-> basic DIMS
-DIMS	-> '['DIMS']'
-		-> eps
+DIMS	-> '['num']'DIMS
+	-> eps
 STMTS	-> STMTS STMT
     	-> eps
 STMT	-> BLOCK

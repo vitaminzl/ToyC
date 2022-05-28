@@ -31,8 +31,9 @@
 #include "Parser.h"
 
 /* 初始化记得move一下 */
-Parser::Parser(Lexer& l):lex(l){
+Parser::Parser(Lexer& l, ostream& o):lex(l), output(o){
     move();
+    Node::setOutput(o);
 }
 
 void Parser::error(string s){ 
@@ -57,6 +58,7 @@ void Parser::program(){
     int after = Node::newLabel();
     s->gen(begin, after);
     s->printLabel(after);
+    output << endl;
 }
 
 const Stmt* Parser::stmts(){
