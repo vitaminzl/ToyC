@@ -52,7 +52,7 @@ void Parser::match(int t){
 
 
 void Parser::program(){
-    const Stmt* s = stmt();
+    const Stmt* s = stmts();
     int begin = Node::newLabel();
     int after = Node::newLabel();
     s->gen(begin, after);

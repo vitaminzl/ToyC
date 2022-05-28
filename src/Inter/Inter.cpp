@@ -29,7 +29,7 @@ void Node::printLabel(int l)const{
 
 /* 打印字符串并换行 */
 void Node::print(string s)const{
-    output << s << endl;
+    output << "\t" << s << endl;
 } 
 
 ostream& Node::output = cout;
@@ -60,19 +60,20 @@ void Expr::jump(int t, int f)const{
 
 void Expr::printJumps(string s, int t, int f)const{
     string strif("if ");
-    string strifF("ifFalse ");
-    string strgoto(" goto");
+    string strifF("if False ");
+    string strgoto("goto");
+    string sp(" ");
     string strT = string(" L") + to_string(t);
     string strF = string(" L") + to_string(f);
     if(t && f){
-        print(strif + toString() + strgoto + strT);
+        print(strif + s + sp + strgoto + strT);
         print(strgoto + strF);
     }
     else if(t){
-        print(strif + toString() + strgoto + strT);
+        print(strif + s + sp + strgoto + strT);
     }
     else if(f){
-        print(strifF + toString() + strgoto + strF);
+        print(strifF + s + sp + strgoto + strF);
     }
     else;
 }
@@ -186,8 +187,28 @@ void Constant::jump(int t, int f)const{
 Logical::Logical(const Token* o, const Expr* e1, const Expr* e2):
 Constant(o, &Type::Bool), expr1(e1), expr2(e2){}
 
+
+/*
+    逻辑表达式生成中间代码，由Set或SetElem调用
+    需要生成2个临时标号一个临时变量：
+    并且将计算值存到临时变量中
+            if False this goto L1
+            t = true
+            goto L2
+    L1:     t = false
+    L2:     x = t
+*/
 const Expr* Logical::gen()const{
-    return new Logical(op, expr1, expr2);
+    int f = newLabel();
+    int t = newLabel();
+    this->jump(0, f);
+    const Expr* temp = new Temp(this->type);
+    print(temp->toString() + string(" = ") + Constant::True.toString());
+    print(string("goto ") + "L" + to_string(t));
+    printLabel(f);
+    print(temp->toString() + string(" = ") + Constant::False.toString());
+    printLabel(t);
+    return temp;
 }
 
 string Logical::toString()const{
@@ -205,8 +226,8 @@ Logical(&Word::Or, expr1, expr2) {}
 /* Or的短路原则，如果第一个表达式正确则直接跳转到t */
 void Or::jump(int t, int f)const{
     int label = (t != 0? t : newLabel());
-    expr1->jump(t, 0);
-    expr2->jump(t, f);
+    expr1->jump(label, 0);
+    expr2->jump(label, f);
     if (!t) printLabel(label);
 }
 
@@ -218,8 +239,8 @@ Logical(&Word::And, e1, e2){}
 /* And的短路原则，如果第一个表达式错误则直接跳转 */
 void And::jump(int t, int f)const {
     int label = (f != 0? f : newLabel());
-    expr1->jump(0, f);
-    expr2->jump(t, f);
+    expr1->jump(0, label);
+    expr2->jump(t, label);
     if (!f) printLabel(label);
 }
 
@@ -292,7 +313,7 @@ const Expr* Seq::gen(int b, int a)const{
         int label = newLabel();
         stmt1->gen(b, label);
         printLabel(label);
-        stmt2->gen(b, a);
+        stmt2->gen(label, a);
     }
 }
 

@@ -10,6 +10,7 @@ using std::endl;
 int main() {
     try{
         Test::testExpr();
+        cout << endl;
     }
     catch(const string msg){
         cout << msg << endl;

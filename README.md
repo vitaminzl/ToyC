@@ -224,6 +224,28 @@ FACTOR	-> ( BOOL )
         -> id OFFSET
 ```
 
+输入
+
+``` txt
+a = b + 1;
+c = a + 32 * 43 - b / ( g - 2);
+d = e + f;
+c = -e[3];
+c[33+34+sd3*c] = de*c + c2;
+f[c[2*d]+4] = df + de[23-s[f]];
+s[m][n][o] = -d[3][x];
+a = !a || s && (c || d) || !f && kk ;
+b = (a + c) > (b * 2 - 1) || a < b && c;
+```
+
+输出
+
+``` txt 
+
+```
+
+
+
 #### 跳转语句的中间代码
 ``` c++
 STMTS	-> STMTS STMT
