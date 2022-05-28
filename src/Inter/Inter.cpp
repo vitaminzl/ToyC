@@ -284,14 +284,14 @@ void Cmp::jump(int t, int f)const {
 
 /* --------------------- Stmt的实现 ------------------------ */
 
-const Stmt Stmt::Null = Stmt();
-
+Stmt Stmt::Null = Stmt();
+Stmt* Stmt::Enclosure = &Stmt::Null;
 
 /* ---------------------- Set的实现 -------------------------- */
 
 Set::Set(const Id* i, const Expr* e): id(i), expr(e){}
 
-void Set::gen(int b, int a)const{
+void Set::gen(int b, int a){
     const Expr* e = expr->gen();
     print(id->toString() + string(" = ") + e->toString());
     delete e;
@@ -303,7 +303,7 @@ SetElem::SetElem(const Id* i, const Expr* e1, const Expr* e2):
 array(i), index(e1), expr(e2){}
 
 
-void SetElem::gen(int b, int a)const {
+void SetElem::gen(int b, int a){
     const Expr* ix = index->reduce();
     const Expr* ex = expr->reduce();
     print(array->toString() + string("[") + ix->toString() + string("] = ") + ex->toString());
@@ -314,10 +314,10 @@ void SetElem::gen(int b, int a)const {
 
 /* ------------------------ Seq的实现 --------------------------- */
 
-Seq::Seq(const Stmt* s1, const Stmt* s2): stmt1(s1), stmt2(s2){}
+Seq::Seq(Stmt* s1, Stmt* s2): stmt1(s1), stmt2(s2){}
 
 /* 一个语句块生成一个Label */
-void Seq::gen(int b, int a)const{
+void Seq::gen(int b, int a){
     if (stmt1 == &Stmt::Null) 
         stmt2->gen(b, a);
     else if (stmt2 == &Stmt::Null)
@@ -332,7 +332,7 @@ void Seq::gen(int b, int a)const{
 
 /* --------------------- If的实现 ---------------------- */
 
-If::If(const Expr* e, const Stmt* s): expr(e), stmt(s){
+If::If(const Expr* e, Stmt* s): expr(e), stmt(s){
     if (!Type::isBool(e->type))
         error("Need Bool in If");
 }
@@ -343,7 +343,7 @@ If::If(const Expr* e, const Stmt* s): expr(e), stmt(s){
     begin:  If False expr goto Label2    
     Label1: Stmt(entry: Label1, exit: after)
 */
-void If::gen(int begin, int after)const{
+void If::gen(int begin, int after){
     int label = newLabel();
     expr->jump(0, label);
     printLabel(label);
@@ -352,7 +352,7 @@ void If::gen(int begin, int after)const{
 
 /* --------------------- Else的实现 ------------------------ */
 
-Else::Else(const Expr* e, const Stmt* s1, const Stmt* s2):
+Else::Else(const Expr* e, Stmt* s1, Stmt* s2):
 expr(e), stmt1(s1), stmt2(s2){
     if (!Type::isBool(e->type))
         error("Need Bool in IF-Else");
@@ -363,7 +363,7 @@ expr(e), stmt1(s1), stmt2(s2){
     label1: Stmt(entry: label1, exit: label2)
     label2: Stmt(entry: label2, exit: after)
 */
-void Else::gen(int begin, int after)const{
+void Else::gen(int begin, int after){
     int label1 = newLabel();
     int label2 = newLabel();
     expr->jump(0, label2);
@@ -376,7 +376,7 @@ void Else::gen(int begin, int after)const{
 
 /* -------------------- While的实现 ----------------------- */
 
-void While::init(const Expr* e, const Stmt* s){
+void While::init(const Expr* e, Stmt* s){
     if (!Type::isBool(e->type))
         error("Need Bool in While");
     expr = e;
@@ -390,8 +390,9 @@ void While::init(const Expr* e, const Stmt* s){
     label:  Stmt(entry: label, exit: begin)
             goto label
 */
-void While::gen(int begin, int after)const{
+void While::gen(int begin, int after){
     int label = newLabel();
+    savedAfter = after;
     expr->jump(label, after);
     printLabel(label);
     stmt->gen(label, begin);
@@ -399,7 +400,7 @@ void While::gen(int begin, int after)const{
 
 /* ------------------- Do的实现 ---------------------- */
 
-void Do::init(const Expr* e, const Stmt* s){
+void Do::init(const Expr* e, Stmt* s){
     if (!Type::isBool(e->type))
         error("Need Bool in While");
     expr = e;
@@ -409,10 +410,25 @@ void Do::init(const Expr* e, const Stmt* s){
 /*  begin:  Stmt(entry: begin, exit: label)
     label:  if expr goto begin else goto after
 */
-void Do::gen(int begin, int after)const{
+void Do::gen(int begin, int after){
     int label = newLabel();
+    savedAfter = after;
     stmt->gen(begin, label);
     printLabel(label);
     expr->jump(begin, after);
 }
 
+
+
+/* ------------------ break的实现 ---------------------*/
+
+Break::Break(){
+    if(Stmt::Enclosure == &Stmt::Null)
+        error("Not Enclosed");
+    stmt = Stmt::Enclosure;
+}
+
+
+void Break::gen(int begin, int after){
+    print(string("goto L") + to_string(after));
+}

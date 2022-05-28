@@ -53,7 +53,7 @@ void Parser::match(int t){
 
 
 void Parser::program(){
-    const Stmt* s = stmts();
+    Stmt* s = block();
     int begin = Node::newLabel();
     int after = Node::newLabel();
     s->gen(begin, after);
@@ -61,21 +61,91 @@ void Parser::program(){
     output << endl;
 }
 
-const Stmt* Parser::stmts(){
-    if (lex.isEOF()) 
+/*
+    BLOCK -> { stmts }
+*/
+Stmt* Parser::block(){
+    match('{');
+    Stmt* s = stmts();
+    match('}');
+    return s;
+}
+
+Stmt* Parser::stmts(){
+    if (lex.isEOF() || lookahead->tag == '}') 
         return &Stmt::Null;
     else 
         return new Seq(stmt(), stmts());
 }
 
-const Stmt* Parser::stmt(){
-    return assign();
+/*
+    STMT    -> ASSIGN';'
+            -> if ( BOOL ) STMT
+            -> if ( BOOL ) STMT else STMT
+            -> while ( BOOL ) STMT
+            -> do STMT while ( BOOL )
+            -> break';'
+            -> BLOCK
+*/
+Stmt* Parser::stmt(){
+    Stmt* savedStmt = nullptr;
+    switch(lookahead->tag){
+        case Tag::IF: {
+            move();
+            match('(');
+            const Expr* e = bools();
+            match(')');
+            Stmt* s = stmt();
+            if (lookahead->tag == Tag::ELSE)
+                return new Else(e, s, stmt());
+            else 
+                return new If(e, s);
+        }
+        case Tag::WHILE: {
+            move();
+            While* wNode = new While();
+            savedStmt = Stmt::Enclosure;
+            Stmt::Enclosure = wNode;
+            match('(');
+            const Expr* e = bools();
+            match(')');
+            wNode->init(e, stmt());
+            Stmt::Enclosure = savedStmt;
+            return wNode;
+        }
+        case Tag::DO: {
+            move();
+            Do* dNode = new Do();
+            savedStmt = Stmt::Enclosure;
+            Stmt::Enclosure = dNode;
+            match(Tag::DO);
+            Stmt* s = stmt();
+            match(Tag::WHILE);
+            match('(');
+            const Expr* e = bools();
+            match(')');
+            match(';');
+            dNode->init(e, s);            
+            Stmt::Enclosure = savedStmt;
+            return dNode;
+        }
+        case Tag::BREAK: {
+            move();
+            match(';');
+            return new Break();
+        }
+        case '{':
+            return block();
+        default: {
+            return assign();
+        }
+    }
 }
 
 
-const Stmt* Parser::assign(){
+Stmt* Parser::assign(){
     const Id* id = new Id((Word*)lookahead);
-    const Stmt* equation = nullptr;
+    Stmt* equation = nullptr;
     match(Tag::ID);
     if (lookahead->tag == '['){
         const Expr* ix = offset(id);

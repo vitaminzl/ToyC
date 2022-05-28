@@ -17,9 +17,10 @@ public:
     void move();
     void match(int t);
     void program();
-    const Stmt* stmts();
-    const Stmt* stmt();
-    const Stmt* assign();
+    Stmt* block();
+    Stmt* stmts();
+    Stmt* stmt();
+    Stmt* assign();
     const Access* offset(const Id* );
     const Expr* bools();
     const Expr* join();

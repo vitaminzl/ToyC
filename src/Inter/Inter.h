@@ -146,11 +146,13 @@ public:
 
 
 class Stmt: public Node{
+protected:
+    int savedAfter = 0;
 public:
-    static const Stmt Null;
+    static Stmt Null;
+    static Stmt* Enclosure;
     Stmt(){}
-    int after = 0;
-    virtual void gen(int b, int a)const{}
+    virtual void gen(int b, int a){}
 };
 
 class Set: public Stmt{
@@ -159,7 +161,7 @@ public:
     const Expr* expr;
     Set(const Id* ,const Expr* );
     virtual Type* check(Type*, Type*){}
-    virtual void gen(int b, int a)const;
+    virtual void gen(int b, int a);
 };
 
 
@@ -170,56 +172,60 @@ public:
     const Expr* expr;
     SetElem(const Id* , const Expr* , const Expr*);
     virtual Type* check(Type*, Type*){}
-    virtual void gen(int b, int a)const;
+    virtual void gen(int b, int a);
 };
 
 class Seq: public Stmt{
 public:
-    const Stmt* stmt1;
-    const Stmt* stmt2;
-    Seq(const Stmt* , const Stmt* );
-    virtual void gen(int b, int a)const;
+    Stmt* stmt1;
+    Stmt* stmt2;
+    Seq(Stmt* , Stmt* );
+    virtual void gen(int b, int a);
 };
 
 class If: public Stmt{
 public:
     const Expr* expr;
-    const Stmt* stmt;
-    If(const Expr* , const Stmt* );
-    virtual void gen(int b, int a)const;
+    Stmt* stmt;
+    If(const Expr* , Stmt* );
+    virtual void gen(int b, int a);
 };
 
 class Else: public Stmt{
 public:
     const Expr* expr;
-    const Stmt* stmt1;
-    const Stmt* stmt2;
-    Else(const Expr* , const Stmt* , const Stmt* );
-    virtual void gen(int b, int a)const;
+    Stmt* stmt1;
+    Stmt* stmt2;
+    Else(const Expr* , Stmt* , Stmt* );
+    virtual void gen(int b, int a);
 };
 
 class While: public Stmt{
 public:
     const Expr* expr;
-    const Stmt* stmt;
+    Stmt* stmt;
     While():expr(nullptr), stmt(nullptr){}
-    void init(const Expr* , const Stmt*);
-    virtual void gen(int b, int a)const;
+    void init(const Expr* , Stmt*);
+    virtual void gen(int b, int a);
 };
 
 class Do: public Stmt{
 public:
     const Expr* expr;
-    const Stmt* stmt;
+    Stmt* stmt;
     Do(): expr(nullptr), stmt(nullptr){}
-    void init(const Expr* , const Stmt* );
-    virtual void gen(int b, int a)const;
+    void init(const Expr* , Stmt* );
+    virtual void gen(int b, int a);
 };
 
 class Break: public Stmt{
 public:
-    const Stmt* stmt;
-    Break(const Stmt* );
+    Stmt* stmt;
+    Break(){
+        if(Stmt::Enclosure == &Stmt::Null)
+            error("Not Enclosed");
+        stmt = Stmt::Enclosure;
+    }
     virtual void gen(int b, int a);
 };
 
