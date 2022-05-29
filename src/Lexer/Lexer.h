@@ -7,126 +7,126 @@ using std::istream;
 using std::string;
 using std::map;
 
-/* å¤šå­—ç¬¦ä¿ç•™å­—ã€æ ‡è¯†ç¬¦Tagç¼–å· */
-enum Tag{
-    IF = 256,   ELSE,       DO,         WHILE,  
-    BREAK,      TRUE,       FALSE,      AND,
-    OR,         NE,         EQ,         LE,
-    GE,         BASIC,      NUM,        REAL,
-    ID,         TEMP,       INDEX,      MINUS,
-    ERR,        SCOPE
+/* ¶à×Ö·û±£Áô×Ö¡¢±êÊ¶·ûTag±àºÅ */
+enum Tag {
+    IF = 256, ELSE, DO, WHILE,
+    BREAK, TRUE, FALSE, AND,
+    OR, NE, EQ, LE,
+    GE, BASIC, NUM, REAL,
+    ID, TEMP, INDEX, MINUS,
+    ERR, SCOPE
 };
 
-/* TokenåŸºç±» */
-class Token{
+/* Token»ùÀà */
+class Token {
 public:
-    const int tag;                      // Tokençš„ç¼–å·
-    Token(int t);                       // ä¼ å…¥å­—ç¬¦çš„ç¼–ç è¿›è¡Œåˆå§‹åŒ–
-    ~Token();                           // ç©ºç™½ææ„å‡½æ•°
-    virtual string toString() const = 0;// å°†tokenè½¬åŒ–ä¸ºStringç±»å‹
-};
-
-
-/* å•å­—ç¬¦Tokenç±» */
-class Charactor: public Token {
-public:
-    static const Charactor AndS;        //ä¸
-    static const Charactor OrS;         //æˆ–
-    static const Charactor Eq;          //ç­‰äºå·
-    static const Charactor Not;         //ä¸ç­‰äºå·
-    static const Charactor Lt;          //å°äºå·
-    static const Charactor Gt;          //å¤§äºå·
-    static const Charactor Opcurly;     //å·¦å¤§æ‹¬å·
-    static const Charactor Clcurly;     //å³å¤§æ‹¬å·
-    static const Charactor Opbracket;   //å·¦ä¸­æ‹¬å·
-    static const Charactor Clbracket;   //å³ä¸­æ‹¬å·
-    static const Charactor Opparenthese;//å·¦å°æ‹¬å·
-    static const Charactor Clparenthese;//å³å°æ‹¬å·
-    static const Charactor Semicolon;   //åˆ†å·
-    static const Charactor Add;         //åŠ å·
-    static const Charactor Sub;         //å‡å·
-    static const Charactor Mul;         //ä¹˜å·
-    static const Charactor Div;         //é™¤å·
-    const char value;                   // å•å­—ç¬¦tokençš„å±æ€§å€¼
-    Charactor(char c, int tag);         // ä¼ å…¥å­—ç¬¦ä»¥åŠå®ƒçš„ASCIIç¼–ç ä½œä¸ºtokenç¼–ç è¿›è¡Œåˆå§‹åŒ–
-    ~Charactor();                       // ç©ºç™½ææ„å‡½æ•°
-    virtual string toString() const;    // å°†tokenè½¬åŒ–ä¸ºStringç±»å‹
+    const int tag;                      // TokenµÄ±àºÅ
+    Token(int t);                       // ´«Èë×Ö·ûµÄ±àÂë½øĞĞ³õÊ¼»¯
+    ~Token();                           // ¿Õ°×Îö¹¹º¯Êı
+    virtual string toString() const = 0;// ½«token×ª»¯ÎªStringÀàĞÍ
 };
 
 
-/* å¤šå­—ç¬¦ä¿ç•™å­—ä»¥åŠæ ‡è¯†ç¬¦ç±» */
-class Word: public Token{
+/* µ¥×Ö·ûTokenÀà */
+class Charactor : public Token {
 public:
-    static const Word And;              //ä¸
-    static const Word Or;               //æˆ–
-    static const Word eq;               //ç­‰äº
-    static const Word ne;               //ä¸ç­‰äº
-    static const Word le;               //å°äºç­‰äº
-    static const Word ge;               //å¤§äºç­‰äº
-    static const Word minus;            //è´Ÿ
-    static const Word True;             //çœŸ
-    static const Word False;            //å‡
-    static const Word temp;             //æ ‡å¿—
-    static const Word err;              //æŠ¥é”™
-    const string value;                 // ä¿ç•™å­—åŠæ ‡è¯†ç¬¦çš„å±æ€§å€¼
-    Word(string s, int tag);            // ä¼ å…¥å­—ç¬¦çš„å±æ€§ä»¥åŠç¼–ç 
-    ~Word();                            // ç©ºç™½ææ„å‡½æ•°
-    virtual string toString() const;    // å°†tokenè½¬åŒ–ä¸ºStringç±»å‹
+    static const Charactor AndS;        //Óë
+    static const Charactor OrS;         //»ò
+    static const Charactor Eq;          //µÈÓÚºÅ
+    static const Charactor Not;         //²»µÈÓÚºÅ
+    static const Charactor Lt;          //Ğ¡ÓÚºÅ
+    static const Charactor Gt;          //´óÓÚºÅ
+    static const Charactor Opcurly;     //×ó´óÀ¨ºÅ
+    static const Charactor Clcurly;     //ÓÒ´óÀ¨ºÅ
+    static const Charactor Opbracket;   //×óÖĞÀ¨ºÅ
+    static const Charactor Clbracket;   //ÓÒÖĞÀ¨ºÅ
+    static const Charactor Opparenthese;//×óĞ¡À¨ºÅ
+    static const Charactor Clparenthese;//ÓÒĞ¡À¨ºÅ
+    static const Charactor Semicolon;   //·ÖºÅ
+    static const Charactor Add;         //¼ÓºÅ
+    static const Charactor Sub;         //¼õºÅ
+    static const Charactor Mul;         //³ËºÅ
+    static const Charactor Div;         //³ıºÅ
+    const char value;                   // µ¥×Ö·ûtokenµÄÊôĞÔÖµ
+    Charactor(char c, int tag);         // ´«Èë×Ö·ûÒÔ¼°ËüµÄASCII±àÂë×÷Îªtoken±àÂë½øĞĞ³õÊ¼»¯
+    ~Charactor();                       // ¿Õ°×Îö¹¹º¯Êı
+    virtual string toString() const;    // ½«token×ª»¯ÎªStringÀàĞÍ
 };
 
-/* æ•´æ•°ç±» */
-class Number: public Token{
+
+/* ¶à×Ö·û±£Áô×ÖÒÔ¼°±êÊ¶·ûÀà */
+class Word : public Token {
 public:
-    const int value;                    // æ•´å‹çš„å±æ€§å€¼
-    Number(int s, int tag);            // ä¼ å…¥å­—ç¬¦çš„å±æ€§ä»¥åŠç¼–ç 
-    ~Number();                         // ç©ºç™½ææ„å‡½æ•°
-    virtual string toString() const;    // å°†tokenè½¬åŒ–ä¸ºStringç±»å‹    
+    static const Word And;              //Óë
+    static const Word Or;               //»ò
+    static const Word eq;               //µÈÓÚ
+    static const Word ne;               //²»µÈÓÚ
+    static const Word le;               //Ğ¡ÓÚµÈÓÚ
+    static const Word ge;               //´óÓÚµÈÓÚ
+    static const Word minus;            //¸º
+    static const Word True;             //Õæ
+    static const Word False;            //¼Ù
+    static const Word temp;             //±êÖ¾
+    static const Word err;              //±¨´í
+    const string value;                 // ±£Áô×Ö¼°±êÊ¶·ûµÄÊôĞÔÖµ
+    Word(string s, int tag);            // ´«Èë×Ö·ûµÄÊôĞÔÒÔ¼°±àÂë
+    ~Word();                            // ¿Õ°×Îö¹¹º¯Êı
+    virtual string toString() const;    // ½«token×ª»¯ÎªStringÀàĞÍ
 };
 
-/* å®æ•°ç±» */
-class Real: public Token{
+/* ÕûÊıÀà */
+class Number : public Token {
 public:
-    const float value;                  // æµ®ç‚¹å‹çš„å±æ€§å€¼
-    Real(float s, int tag);            // ä¼ å…¥å­—ç¬¦çš„å±æ€§ä»¥åŠç¼–ç 
-    ~Real();                           // ç©ºç™½ææ„å‡½æ•°
-    virtual string toString() const;    // å°†tokenè½¬åŒ–ä¸ºStringç±»å‹
+    const int value;                    // ÕûĞÍµÄÊôĞÔÖµ
+    Number(int s, int tag);            // ´«Èë×Ö·ûµÄÊôĞÔÒÔ¼°±àÂë
+    ~Number();                         // ¿Õ°×Îö¹¹º¯Êı
+    virtual string toString() const;    // ½«token×ª»¯ÎªStringÀàĞÍ    
 };
 
-/*ç±»å‹ç±»*/
-class Type: public Word{
+/* ÊµÊıÀà */
+class Real : public Token {
 public:
-    const int width;                    // å˜é‡æ‰€å å­—èŠ‚æ•°
-    static const Type Int;              // æ•´æ•°ç±»å‹
-    static const Type Float;            // æµ®ç‚¹æ•°ç±»å‹
-    static const Type Bool;             // å¸ƒå°”ç±»å‹
-    static const Type Char;             // å­—ç¬¦ç±»å‹
-    Type(string s, int tag, int width); // ä¼ å…¥å­—ç¬¦çš„å±æ€§ã€ç¼–ç ä»¥åŠæ‰€å ç©ºé—´å¤§å°
-    ~Type();                            // ç©ºç™½ææ„å‡½æ•°
-    bool isBool(Type* t) const;          //åˆ¤æ–­æ˜¯å¦æ˜¯åŸºæœ¬å‹ï¼ˆbasicï¼‰
-    const Type* max(Type* ta, Type* tb) const;   //åˆ¤æ–­ç±»å‹è½¬æ¢å‡½æ•°
-    virtual string toString() const;     // å°†tokenè½¬åŒ–ä¸ºStringç±»å‹
+    const float value;                  // ¸¡µãĞÍµÄÊôĞÔÖµ
+    Real(float s, int tag);            // ´«Èë×Ö·ûµÄÊôĞÔÒÔ¼°±àÂë
+    ~Real();                           // ¿Õ°×Îö¹¹º¯Êı
+    virtual string toString() const;    // ½«token×ª»¯ÎªStringÀàĞÍ
 };
 
-/*æ•°ç»„ç±»*/
-class Array: public Type{
+/*ÀàĞÍÀà*/
+class Type : public Word {
 public:
-    Type type;
+    const int width;                    // ±äÁ¿ËùÕ¼×Ö½ÚÊı
+    static const Type Int;              // ÕûÊıÀàĞÍ
+    static const Type Float;            // ¸¡µãÊıÀàĞÍ
+    static const Type Bool;             // ²¼¶ûÀàĞÍ
+    static const Type Char;             // ×Ö·ûÀàĞÍ
+    Type(string s, int tag, int width); // ´«Èë×Ö·ûµÄÊôĞÔ¡¢±àÂëÒÔ¼°ËùÕ¼¿Õ¼ä´óĞ¡
+    ~Type();                            // ¿Õ°×Îö¹¹º¯Êı
+    bool isBool(Type* t) const;          //ÅĞ¶ÏÊÇ·ñÊÇ²¼¶ûĞÍ
+    const Type* max(Type* ta, Type* tb) const;   //ÅĞ¶ÏÀàĞÍ×ª»»º¯Êı
+    virtual string toString() const;     // ½«token×ª»¯ÎªStringÀàĞÍ
+};
+
+/*Êı×éÀà*/
+class Array : public Type {
+public:
+    Type* p;
     int size = 1;
-    Array(int sz,Type* p);
+    Array(int sz, Type* p);
     ~Array();
     virtual string toString() const;
 };
 
-/*è¯æ³•åˆ†æå™¨ç±»*/
-class Lexer{
+/*´Ê·¨·ÖÎöÆ÷Àà*/
+class Lexer {
 private:
-    //è®°å½•å½“å‰è¡Œå·
+    //¼ÇÂ¼µ±Ç°ĞĞºÅ
     int line = 1;
-    //ç¼“å†²åŒº
+    //»º³åÇø
     char cache = ' ';
-    //å­—ç¬¦è¡¨
+    //×Ö·û±í
     map<string, const Word*> words;
-    istream &input;
+    istream& input;
     void reserve(const Word* w) {
         words.insert(std::pair<string, const Word*>(w->value, w));
     }
@@ -134,7 +134,7 @@ public:
     Lexer(istream& in);
     ~Lexer();
     char* readch();
-    int getline() {return line;}
+    int getline() { return line; }
     bool readch(char c);
     bool isEOF();
     const Token* scan();

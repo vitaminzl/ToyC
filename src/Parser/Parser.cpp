@@ -1,37 +1,40 @@
 #include "Parser.h"
-#include "../Inter/Inter.h"
+#include "Inter.h"
 #include <iostream>
 using namespace std;
 /*Parser类的定义*/
-Parser::Parser(Lexer* l):lex(l) {}
-Parser::~Parser(){}
-void Parser::move(){
+Parser::Parser(Lexer* l) :lex(l), lookahead(l->scan()), top(nullptr), used(0) {}
+Parser::~Parser() {}
+void Parser::move() {
 	lookahead = lex->scan();
 }
-void Parser::error(string s){
+void Parser::error(string s) {
 	throw (string("near line") + to_string(lex->getline()) + ":" + s);
 }
-void Parser::match(int t){
-	if (lookahead->tag == t)
+void Parser::match(int t) {
+	if (lookahead->tag == t) {
+		//cout <<"match：" << lookahead->toString() << endl;
 		move();
+	}
 	else
-		error("error");
+		error("error:unmatch");
 }
 void Parser::program() {
 	block();
+	cout << endl;
 }
 void Parser::block() {
 	//block->{ decls stmts }
 	match('{');
 	cout << "{";
 	Scope* saved = top;
-	top = new Scope(top);
+	top = new Scope(saved);
 	decls();
 	stmts();
 	match('}');
 	cout << "}";
+	delete top;
 	top = saved;
-	delete saved;
 }
 Type* Parser::type() {
 	Type* p = (Type*)lookahead;
@@ -55,34 +58,43 @@ void Parser::decls() {
 	}
 }
 void Parser::stmts() {
-	if(lookahead->tag=='}')
+	if (lookahead->tag == '}')
 		return;
 	else {
+
 		stmt();
 		stmts();
 	}
 }
 void Parser::stmt() {
-	if (lookahead->tag == '}')
-		block();
-	else {
+	if (lookahead->tag == Tag::ID) {
 		factor();
 		match(';');
+	}
+	else{
+		block();
 	}
 
 }
 void Parser::factor() {
+	const Token* tok = lookahead;
 	match(Tag::ID);
-	Id* id = top->get(lookahead);
-	cout << lookahead->toString() << ":" << id->type->toString();
+	if (top->get(tok) == nullptr)
+		error("error:undefine");
+	else {
+		Id* id = top->get(tok);
+		cout << tok->toString() << ":" << id->type->toString() << "; ";
+	}
 }
 Type* Parser::dims(Type* p) {
 	match('[');
-	const Token* tok = lookahead;
+	const Number* num = (Number*)lookahead;
 	match(Tag::NUM);
 	match(']');
+	p = new Array(num->value,p);
 	if (lookahead->tag == '[')
 		p = dims(p);
-	Number* num = new Number(0, tok->tag);
-	return new Array(num->value, p);
+	//cout << p->toString() << endl;
+	return p;
+	//return new Array(num->value, p);
 }

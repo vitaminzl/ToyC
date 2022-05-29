@@ -1,14 +1,18 @@
 {
     int a;
+    int c;
+    int[200] d;
+    int f;
     {
         int b;
         a;
         b;
     }
-    int c;
-    int[200] d;
     {
         char a;
+        int b;
+        int s;
+        int[10][20] e;
         {
             bool a;
             char e;
@@ -20,9 +24,8 @@
             f;
             e;
         }
-        int b;
         e;
     }
-    int f;
     f;
+    z;
 }

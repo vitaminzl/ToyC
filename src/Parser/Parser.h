@@ -1,7 +1,7 @@
 #ifndef PARSER
 #define PARSER
-#include "../Lexer/Lexer.h"
-#include "../Inter/Inter.h"
+#include "Lexer.h"
+#include "Inter.h"
 #include <string>
 class Parser {
 private:

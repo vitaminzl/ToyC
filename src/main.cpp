@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 //#include "Lexer/Lexer.h"
-#include "Test/Test.h"
-//using namespace std;
+#include "Test.h"
+using namespace std;
 
 //¶ÁÈ¡txtÎÄ¼ş
 std::vector<std::string> read_txt(const std::string& path)
@@ -51,8 +51,17 @@ int main()
 
 
 int main() {
-    Test t;
-    t.testScan();
-    system("pause");
-    return 0;
+	Test t;
+	string path = "testsymbol.txt";
+	string path2 = "test02.txt";
+	string path3 = "test01.txt";
+	try {	
+		t.testScan(path3);
+		//t.testSymbol(path);
+	}
+	catch(string s) {
+		cout << "ERROR:" << s << endl;
+	}
+	system("pause");
+	return 0;
 }

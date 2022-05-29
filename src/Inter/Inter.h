@@ -2,13 +2,13 @@
 #define INTER
 #include <string>
 #include <map>
-#include "../Lexer/Lexer.h"
+#include "Lexer.h"
 using std::string;
-using namespace std;
-/*æŠ½è±¡è¯­æ³•æ ‘ä¸­çš„ç»“ç‚¹*/
-class Node{
+// using namespace std;
+/*³éÏóÓï·¨Ê÷ÖĞµÄ½áµã*/
+class Node {
 protected:
-    int lexline = 0;             //æºç¨‹åºä¸­çš„è¡Œå·
+    int lexline = 0;             //Ô´³ÌĞòÖĞµÄĞĞºÅ
 public:
     static const int labels;
     Node(int);
@@ -19,11 +19,11 @@ public:
     void print(string s);
 };
 
-/*è¡¨è¾¾å¼ç±»ï¼šNodeçš„å­ç±»*/
-class Expr: public Node{
-public: 
-    Token* Op;                    //ç»“ç‚¹ä¸Šçš„è¿ç®—ç¬¦
-    Type* type;                   //ç»“ç‚¹ä¸Šçš„ç±»å‹
+/*±í´ïÊ½Àà£ºNodeµÄ×ÓÀà*/
+class Expr : public Node {
+public:
+    Token* Op;                    //½áµãÉÏµÄÔËËã·û
+    Type* type;                   //½áµãÉÏµÄÀàĞÍ
     Expr(Token*, Type*);
     ~Expr();
     void printJumps();
@@ -33,11 +33,11 @@ public:
     virtual string tostring();
 };
 
-/*æ ‡è¯†ç¬¦ç±»ï¼šExprçš„å­ç±»
-å¯¹åº”äºä¸€ä¸ªæ ‡è¯†ç¬¦çš„ç±»Idçš„ç»“ç‚¹æ˜¯ä¸€ä¸ªå¶å­ç»“ç‚¹*/
-class Id: public Expr{
+/*±êÊ¶·ûÀà£ºExprµÄ×ÓÀà
+¶ÔÓ¦ÓÚÒ»¸ö±êÊ¶·ûµÄÀàIdµÄ½áµãÊÇÒ»¸öÒ¶×Ó½áµã*/
+class Id : public Expr {
 private:
-    int offset;                         //æ ‡è¯†ç¬¦çš„ç›¸å¯¹åœ°å€
+    int offset;                         //±êÊ¶·ûµÄÏà¶ÔµØÖ·
 public:
     Id(Word* id, Type* p, int b);
     ~Id();
@@ -46,8 +46,8 @@ public:
 
 
 
-/* ç¬¦å·è¡¨ */
-class Scope{
+/* ·ûºÅ±í */
+class Scope {
 private:
     map<const Token*, Id*> table;
     Scope* prev;
@@ -56,6 +56,7 @@ public:
     ~Scope();
     void put(const Token*, Id*);
     Id* get(const Token*);
+    void printscope();
 };
 
 

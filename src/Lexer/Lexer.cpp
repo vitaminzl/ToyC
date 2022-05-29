@@ -2,22 +2,22 @@
 #include <utility>
 #include <ctype.h>
 using namespace std;
-/* Tokenç±»çš„å®žçŽ° */
-Token::Token(int t): tag(t){} 
-Token::~Token(){}
+/* TokenÀàµÄÊµÏÖ */
+Token::Token(int t) : tag(t) {}
+Token::~Token() {}
 
-/* Charactorç±»çš„å®žçŽ° */
+/* CharactorÀàµÄÊµÏÖ */
 Charactor::Charactor(char s, int t) : Token(t), value(s) {}
 Charactor::~Charactor() {}
-const Charactor Charactor:: AndS = Charactor('&', '&');
-const Charactor Charactor:: OrS = Charactor('|', '|');
-const Charactor Charactor:: Eq = Charactor('=', '=');
-const Charactor Charactor:: Not = Charactor('!', '!');
-const Charactor Charactor:: Lt = Charactor('<', '<');
-const Charactor Charactor:: Gt = Charactor('>', '>');
-const Charactor Charactor:: Opcurly = Charactor('{', '{');
-const Charactor Charactor:: Clcurly = Charactor('}', '}');
-const Charactor Charactor:: Semicolon = Charactor(';', ';');
+const Charactor Charactor::AndS = Charactor('&', '&');
+const Charactor Charactor::OrS = Charactor('|', '|');
+const Charactor Charactor::Eq = Charactor('=', '=');
+const Charactor Charactor::Not = Charactor('!', '!');
+const Charactor Charactor::Lt = Charactor('<', '<');
+const Charactor Charactor::Gt = Charactor('>', '>');
+const Charactor Charactor::Opcurly = Charactor('{', '{');
+const Charactor Charactor::Clcurly = Charactor('}', '}');
+const Charactor Charactor::Semicolon = Charactor(';', ';');
 const Charactor Charactor::Opbracket = Charactor('[', '[');
 const Charactor Charactor::Clbracket = Charactor(']', ']');
 const Charactor Charactor::Opparenthese = Charactor('(', '(');
@@ -27,56 +27,56 @@ const Charactor Charactor::Sub = Charactor('-', '-');
 const Charactor Charactor::Mul = Charactor('*', '*');
 const Charactor Charactor::Div = Charactor('/', '/');
 string Charactor::toString() const {
-    return (string("")+value);
+    return (string("") + value);
 }
 
-/* Wordç±»çš„å®žçŽ° */
+/* WordÀàµÄÊµÏÖ */
 Word::Word(string s, int t) : Token(t), value(s) {}
-Word::~Word(){}
-const Word Word:: And = Word(string("&&"), Tag::AND);
-const Word Word:: Or = Word(string("||"), Tag::OR);
-const Word Word:: eq = Word(string("=="), Tag::EQ);
-const Word Word:: ne = Word(string("!="), Tag::NE);
-const Word Word:: le = Word(string("<="), Tag::LE);
-const Word Word:: ge = Word(string(">="), Tag::GE);
-const Word Word:: minus = Word(string("-"), Tag::MINUS);
-const Word Word:: True = Word(string("true"), Tag::TRUE);
-const Word Word:: False = Word(string("false"), Tag::FALSE);
-const Word Word:: temp = Word(string("t"), Tag::TEMP);
-const Word Word:: err = Word(string("error"), Tag::ERR);
-string Word::toString() const{
+Word::~Word() {}
+const Word Word::And = Word(string("&&"), Tag::AND);
+const Word Word::Or = Word(string("||"), Tag::OR);
+const Word Word::eq = Word(string("=="), Tag::EQ);
+const Word Word::ne = Word(string("!="), Tag::NE);
+const Word Word::le = Word(string("<="), Tag::LE);
+const Word Word::ge = Word(string(">="), Tag::GE);
+const Word Word::minus = Word(string("-"), Tag::MINUS);
+const Word Word::True = Word(string("true"), Tag::TRUE);
+const Word Word::False = Word(string("false"), Tag::FALSE);
+const Word Word::temp = Word(string("t"), Tag::TEMP);
+const Word Word::err = Word(string("error"), Tag::ERR);
+string Word::toString() const {
     return value;
 }
 
-/* Numberç±»çš„å®žçŽ° */
-Number::Number(int s=0, int t=Tag::NUM) : Token(t), value(s) {}
+/* NumberÀàµÄÊµÏÖ */
+Number::Number(int s = 0, int t = Tag::NUM) : Token(t), value(s) {}
 Number::~Number() {}
 string Number::toString() const {
     return std::to_string(value);
 }
 
-/* Realç±»çš„å®žçŽ° */
+/* RealÀàµÄÊµÏÖ */
 Real::Real(float s, int t) : Token(t), value(s) {}
 Real::~Real() {}
 string Real::toString() const {
     return std::to_string(value);
 }
 
-/* Typeç±»çš„å®žçŽ° */
-Type::Type(string s, int t,int w) : Word(s,t), width(w) {}
+/* TypeÀàµÄÊµÏÖ */
+Type::Type(string s, int t, int w) : Word(s, t), width(w) {}
 Type::~Type() {}
 const Type Type::Int = Type(string("int"), Tag::BASIC, 4);
 const Type Type::Float = Type(string("float"), Tag::BASIC, 4);
 const Type Type::Bool = Type(string("bool"), Tag::BASIC, 1);
 const Type Type::Char = Type(string("char"), Tag::BASIC, 1);
-//å‡½æ•°ï¼šåˆ¤æ–­æ˜¯å¦æ˜¯åŸºæœ¬åž‹
-bool Type::isBool(Type* t) const{
+//º¯Êý£ºÅÐ¶ÏÊÇ·ñÊÇ»ù±¾ÐÍ
+bool Type::isBool(Type* t) const {
     if (t == &Type::Int || t == &Type::Float || t == &Type::Char)
         return false;
     else
         return true;
 }
-//å‡½æ•°ï¼šåˆ¤æ–­è½¬æ¢æˆçš„ç±»åž‹
+//º¯Êý£ºÅÐ¶Ï×ª»»³ÉµÄÀàÐÍ
 const Type* Type::max(Type* ta, Type* tb) const {
     if (!isBool(ta) || !isBool(tb))
         return nullptr;
@@ -91,15 +91,19 @@ string Type::toString() const {
     return value;
 }
 
-/* Arrayç±»çš„å®žçŽ° */
-Array::Array(int sz,Type* p) : Type(string(""), Tag::INDEX, sz*p->width), size(sz),type(*p) {}
+/* ArrayÀàµÄÊµÏÖ */
+Array::Array(int sz, Type* tp) : Type(string(""), Tag::INDEX, sz* tp->width), size(sz), p(tp) {}
 Array::~Array() {}
 string Array::toString() const {
-    return (string("[")+std::to_string(size)+string("]")+type.toString());
+    Type* tp = p;
+    if (tp->tag != Tag::BASIC)
+        tp = ((Array* )tp)->p;
+    //cout << size << "+" << tp->width << endl;
+    return (string("[") + std::to_string(width/tp->width) + string("]") + tp->toString());
 }
 
-/* Lexerç±»çš„å®žçŽ° */
-Lexer::Lexer(istream& in):input(in) {
+/* LexerÀàµÄÊµÏÖ */
+Lexer::Lexer(istream& in) :input(in) {
     reserve(new Word("if", Tag::IF));
     reserve(new Word("else", Tag::ELSE));
     reserve(new Word("while", Tag::WHILE));
@@ -112,9 +116,9 @@ Lexer::Lexer(istream& in):input(in) {
     reserve(&Type::Bool);
     reserve(&Type::Float);
 }
-Lexer::~Lexer(){}
+Lexer::~Lexer() {}
 char* Lexer::readch() {
-    cache=input.get();
+    cache = input.get();
     //cout << "cache:" << cache << endl;
     return &cache;
 }
@@ -228,7 +232,7 @@ const Token* Lexer::scan() {
                 readch();
                 if (!std::isdigit(cache))
                     break;
-                x = x + ((int)cache-48) / d;
+                x = x + ((int)cache - 48) / d;
                 d = d * 10;
             }
             Real* re = new Real(x, Tag::REAL);
@@ -242,7 +246,7 @@ const Token* Lexer::scan() {
             readch();
         } while (std::isalpha(cache) || std::isdigit(cache));
         if (words.count(b)) {
-            const Word * w = words[b];
+            const Word* w = words[b];
             return w;
         }
         else {

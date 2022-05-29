@@ -1,11 +1,13 @@
 #ifndef TEST
 #define TEST
-#include "../Parser/Parser.h"
+#include "Parser.h"
+#include <string>
+using std::string;
 
-class Test{
+class Test {
 public:
-    void testScan();
-    void testSymbol();
+    void testScan(string path);
+    void testSymbol(string path);
 };
 
 

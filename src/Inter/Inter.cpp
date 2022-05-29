@@ -1,10 +1,10 @@
-#include <string>
+ï»¿#include <string>
 #include <iostream>
-#include "../Inter/Inter.h"
+#include "Inter.h"
 using namespace std;
-/*NodeÀàµÄÊµÏÖ*/
-Node::Node(int t=1):lexline(t) {}
-Node::~Node(){}
+/*Nodeç±»çš„å®šä¹‰*/
+Node::Node(int t = 1) :lexline(t) {}
+Node::~Node() {}
 void Node::error(string s)
 {
 }
@@ -18,9 +18,9 @@ void Node::printLabel(int)
 void Node::print(string s)
 {
 }
-/*ExprÀàµÄÊµÏÖ*/
-Expr::Expr(Token* tok, Type* p):Op(tok),type(p) {}
-Expr::~Expr(){}
+/*Exprç±»çš„å®šä¹‰*/
+Expr::Expr(Token* tok, Type* p) :Op(tok), type(p) {}
+Expr::~Expr() {}
 void Expr::printJumps()
 {
 }
@@ -39,27 +39,27 @@ string Expr::tostring()
 {
 	return string();
 }
-/*IdÀàµÄÊµÏÖ*/
-Id::Id(Word* id, Type* p, int b):Expr(id,p),offset(b) {}
-Id::~Id(){}
+/*Idç±»çš„å®šä¹‰*/
+Id::Id(Word* id, Type* p, int b) :Expr(id, p), offset(b) {}
+Id::~Id() {}
 int Id::getOffset()
 {
 	return offset;
 }
-/*OpÀàµÄÊµÏÖ*/
-/*
-Op::Op(Word* id, Type* p) :Expr(id, p) {}
-Op::~Op(){}
-*/
-/* ScopeÀàµÄÊµÏÖ */
-Scope::Scope(Scope* n){
+/* Scopeç±»çš„å®šä¹‰*/
+Scope::Scope(Scope* n=nullptr) {
 	prev = n;
 }
-Scope:: ~Scope(){}
+Scope:: ~Scope() {}
 void Scope::put(const Token* w, Id* i) {
 	table.insert(std::pair<const Token*, Id*>(w, i));
 }
 Id* Scope::get(const Token* w) {
+	/*è°ƒè¯•ç”¨
+	printscope();
+	cout << "***************************************" << endl;
+	cout << endl;
+	*/
 	for (Scope* sc = this; sc != nullptr; sc = sc->prev) {
 		if (sc->table.count(w)) {
 			Id* found = (Id*)(sc->table[w]);
@@ -67,4 +67,19 @@ Id* Scope::get(const Token* w) {
 		}
 	}
 	return nullptr;
+}
+/*æ‰“å°ç¬¦å·è¡¨å±‚çº§*/
+void Scope::printscope() {
+	int i = 0;
+	for (Scope* sc = this; sc != nullptr; sc = sc->prev) {
+		cout << "----------------------------------------------" << endl;
+		cout << "ç¬¦å·è¡¨ç¬¬" << i++ << "å±‚ï¼š" << endl;
+		map<const Token*, Id*>::iterator it;
+		for (it = sc->table.begin(); it != sc->table.end(); it++) {
+			Type* tp = (Type*)(it->first);
+			Id* id = (Id*)(it->second);
+			cout << tp->toString() <<" " << id->type->toString() << endl;
+		}
+		cout<<"----------------------------------------------" << endl;
+	}
 }
