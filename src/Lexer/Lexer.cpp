@@ -98,6 +98,11 @@ Type(string(""), Tag::INDEX, sz*p->width), size(sz), next(p) {}
 Array::~Array() {}
 
 string Array::toString() const {
+    // const Type* tp = next;
+    // if (tp->tag != Tag::BASIC)
+    //     tp = ((Array* )tp)->next;
+    // //cout << size << "+" << tp->width << endl;
+    // return string("Arr(") + tp->toString() + string(")");
     return (string("[")+std::to_string(size)+string("]")+next->toString());
 }
 

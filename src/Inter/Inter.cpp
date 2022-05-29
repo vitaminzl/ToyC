@@ -7,6 +7,46 @@ using std::to_string;
 using std::cout;
 using std::endl;
 using std::ofstream;
+
+/* Scope类的定义*/
+Scope::Scope(Scope* n=nullptr) {
+	prev = n;
+}
+Scope:: ~Scope() {}
+void Scope::put(const Token* w, Id* i) {
+	table.insert(std::pair<const Token*, Id*>(w, i));
+}
+Id* Scope::get(const Token* w) {
+	/*调试用
+	printscope();
+	cout << "***************************************" << endl;
+	cout << endl;
+	*/
+	for (Scope* sc = this; sc != nullptr; sc = sc->prev) {
+		if (sc->table.count(w)) {
+			Id* found = (Id*)(sc->table[w]);
+			return found;
+		}
+	}
+	return nullptr;
+}
+/*打印符号表层级*/
+void Scope::printscope() {
+	int i = 0;
+	for (Scope* sc = this; sc != nullptr; sc = sc->prev) {
+		cout << "----------------------------------------------" << endl;
+		cout << "符号表第" << i++ << "层：" << endl;
+		map<const Token*, Id*>::iterator it;
+		for (it = sc->table.begin(); it != sc->table.end(); it++) {
+			Type* tp = (Type*)(it->first);
+			Id* id = (Id*)(it->second);
+			cout << tp->toString() <<" " << id->type->toString() << endl;
+		}
+		cout<<"----------------------------------------------" << endl;
+	}
+}
+
+
 /* ----------- Node实现部分 ------------ */
 
 /* 初始化标号为0 */
@@ -95,6 +135,10 @@ Id::Id(const Word* w, const Type* i, int o): Expr(w, i), offset(o){}
 int Id::getOffset(){
     return offset;
 }
+// string Id::toString()const{
+//     // return type->toString() + string("{") + to_string(offset) + string("}");
+//     return op->toString();
+// }
 
 /* ------------- Temp实现部分 ------------ */
 
@@ -122,7 +166,7 @@ const Expr* Op::reduce()const{
     const Expr* arith = gen();
     Temp* temp = new Temp(arith->type);
     print(temp->toString() + string(" = ") + arith->toString());
-    delete arith;
+    // delete arith;
     return temp;
 }
 
@@ -168,7 +212,7 @@ const Expr* Access::gen()const{
 void Access::jump(int t, int f)const{
     const Expr* e = this->reduce();
     string s = e->toString();
-    delete e;
+    // delete e;
     printJumps(s, t, f);
 }
 
@@ -279,8 +323,8 @@ void Cmp::jump(int t, int f)const {
     const Expr* e1 = expr1->reduce();
     const Expr* e2 = expr2->reduce();
     string s = e1->toString() + " " + op->toString() + " " + e2->toString();
-    delete e1;
-    delete e2;
+    // delete e1;
+    // delete e2;
     printJumps(s, t, f);
 }
 
@@ -302,7 +346,7 @@ Set::Set(const Id* i, const Expr* e, int l): id(i), expr(e), Stmt(l){}
 void Set::gen(int b, int a){
     const Expr* e = expr->gen();
     print(id->toString() + string(" = ") + e->toString());
-    delete e;
+    // delete e;
 }
 
 /* ---------------------- SetElem的实现 -------------------------- */
@@ -317,8 +361,8 @@ void SetElem::gen(int b, int a){
     const Expr* ix = index->reduce();
     const Expr* ex = expr->reduce();
     print(array->toString() + string("[") + ix->toString() + string("] = ") + ex->toString());
-    delete ix;
-    delete ex;
+    // delete ix;
+    // delete ex;
 }
 
 

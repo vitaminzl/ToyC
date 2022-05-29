@@ -8,6 +8,8 @@ class Parser{
 private:
     Lexer& lex;
     const Token* lookahead;
+    Scope* top = nullptr;       //当前或顶层的符号表
+    int used = 0;
     ostream& output;
 public:
     Parser(Lexer& lex, ostream&);
@@ -17,6 +19,9 @@ public:
     void match(int t);
     void program();
     Stmt* block();
+    void decls();
+    Type* type();
+    Type* dims(Type*);
     Stmt* stmts();
     Stmt* stmt();
     Stmt* assign();

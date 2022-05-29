@@ -50,6 +50,7 @@ public:
     Id(const Word* id): Expr(id, &Type::Int), offset(0){}   // 模块调试使用
     Id(const Word* id, const Type* p, int b);
     int getOffset();
+    // virtual string toString()const;
 };
 
 class Temp: public Expr{
@@ -239,16 +240,17 @@ public:
 };
 
 /* 符号表 */
-// class Scope: public Type{
-// private:
-//     map<Token, Id> table;
-//     Scope* prev;
-// public:
-//     Scope();
-//     ~Scope();
-//     void put(Type, Id);
-//     void get(Id);
-// };
+class Scope {
+private:
+    map<const Token*, Id*> table;
+    Scope* prev;
+public:
+    Scope(Scope* n);
+    ~Scope();
+    void put(const Token*, Id*);
+    Id* get(const Token*);
+    void printscope();
+};
 
 
 #endif

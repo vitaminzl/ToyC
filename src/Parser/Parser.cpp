@@ -40,11 +40,54 @@ void Parser::program(){
 /*
     BLOCK -> { stmts }
 */
-Stmt* Parser::block(){
-    match('{');
+Stmt* Parser::block() {
+	//block->{ decls stmts }
+	match('{');
+	Scope* saved = top;
+	// cout << "{";
+	top = new Scope(saved);
+	decls();
     Stmt* s = stmts();
-    match('}');
+	match('}');
+	// cout << "}";
+	delete top;
+	top = saved;
     return s;
+}
+Type* Parser::type() {
+	Type* p = (Type*)lookahead;
+	match(Tag::BASIC);
+	if (lookahead->tag != '[')
+		return p;
+	else
+		return dims(p);
+}
+void Parser::decls() {
+	//decls->type id; type id; type id;type id; ...
+	while (lookahead->tag == Tag::BASIC) {
+		Type* p = type();
+        // cout << lookahead->toString() << p->toString() << p->tag << endl;
+		const Token* tok = lookahead;
+		Word* w = new Word(((Word*)lookahead)->value, lookahead->tag);
+		match(Tag::ID);
+		match(';');
+		Id* id = new Id(w, p, used);
+		top->put(tok, id);
+        used += p->width;
+	}
+}
+
+Type* Parser::dims(Type* p) {
+	match('[');
+	const Number* num = (Number*)lookahead;
+	match(Tag::NUM);
+	match(']');
+	p = new Array(num->value,p);
+	if (lookahead->tag == '[')
+		p = dims(p);
+	//cout << p->toString() << endl;
+	return p;
+	//return new Array(num->value, p);
 }
 
 Stmt* Parser::stmts(){
@@ -126,7 +169,7 @@ Stmt* Parser::stmt(){
 
 
 Stmt* Parser::assign(){
-    const Id* id = new Id((Word*)lookahead);
+    const Id* id = top->get(lookahead);
     Stmt* equation = &Stmt::Null;
     match(Tag::ID);
     if (lookahead->tag == '['){
@@ -151,16 +194,25 @@ Stmt* Parser::assign(){
 
 */
 const Access* Parser::offset(const Id* id){
-    int SIZE = 10; // 模块调试使用
+    /* 指向下一维度数组的width */
+    // cout << id->toString() << id->type->toString()<< endl;
+    if(id->type->tag != Tag::INDEX)
+        error("Not an array type!");
+    const Type* tp = ((Array* )id->type)->next; 
     match('[');
     const Expr* first = bools();
     match(']');
-    const Expr* loc = new Arith(&Charactor::Mul, first, new Constant(SIZE));
+    // cout << lex.getLine() << endl;
+    const Expr* loc = new Arith(&Charactor::Mul, first, new Constant(tp->width));
     while(lookahead->tag == '['){
         match('[');
+        if (tp->tag == Tag::BASIC){
+            error("Out of Array Dims;");
+        }
         const Expr* next = bools();
         match(']');
-        const Expr* t = new Arith(&Charactor::Mul, next, new Constant(SIZE));
+        tp = ((Array*) tp)->next;
+        const Expr* t = new Arith(&Charactor::Mul, next, new Constant(tp->width));
         loc = new Arith(&Charactor::Add, loc, t);     
     }
     return new Access(id, loc, &Type::Int);
@@ -310,8 +362,11 @@ const Expr* Parser::factor(){
         return b;
         }
     case Tag::ID: {
-        const Id* id = new Id((Word*)lookahead);
+        const Id* id = top->get(lookahead);
         move();
+        if (id == nullptr){
+            error("Undeclared");
+        }
         if(lookahead->tag == '[')
             return offset(id);
         else 
