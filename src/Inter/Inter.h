@@ -152,6 +152,7 @@ public:
     static Stmt Null;
     static Stmt* Enclosure;
     Stmt(){}
+    int getsavedAfter(){ return savedAfter; }
     virtual void gen(int b, int a){}
 };
 
@@ -221,11 +222,7 @@ public:
 class Break: public Stmt{
 public:
     Stmt* stmt;
-    Break(){
-        if(Stmt::Enclosure == &Stmt::Null)
-            error("Not Enclosed");
-        stmt = Stmt::Enclosure;
-    }
+    Break();
     virtual void gen(int b, int a);
 };
 

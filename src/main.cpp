@@ -9,7 +9,7 @@ using std::endl;
 
 int main() {
     try{
-        Test::testExpr();
+        Test::testControls();
     }
     catch(const string msg){
         cout << msg << endl;

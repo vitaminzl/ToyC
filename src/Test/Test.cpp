@@ -11,3 +11,11 @@ void Test::testExpr() {
     Parser parser(lexer, output);
     parser.program();
 }
+
+void Test::testControls() {
+    ifstream input("testControls.txt");
+    ofstream output("testControls-intercode.txt");
+    Lexer lexer(input);
+    Parser parser(lexer, cout);
+    parser.program();
+}

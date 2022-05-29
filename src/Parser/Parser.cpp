@@ -56,6 +56,7 @@ void Parser::program(){
     Stmt* s = block();
     int begin = Node::newLabel();
     int after = Node::newLabel();
+    s->printLabel(begin);
     s->gen(begin, after);
     s->printLabel(after);
     output << endl;
@@ -96,8 +97,10 @@ Stmt* Parser::stmt(){
             const Expr* e = bools();
             match(')');
             Stmt* s = stmt();
-            if (lookahead->tag == Tag::ELSE)
+            if (lookahead->tag == Tag::ELSE){
+                move();
                 return new Else(e, s, stmt());
+            }
             else 
                 return new If(e, s);
         }
@@ -118,7 +121,7 @@ Stmt* Parser::stmt(){
             Do* dNode = new Do();
             savedStmt = Stmt::Enclosure;
             Stmt::Enclosure = dNode;
-            match(Tag::DO);
+            // match(Tag::DO);
             Stmt* s = stmt();
             match(Tag::WHILE);
             match('(');
@@ -145,16 +148,16 @@ Stmt* Parser::stmt(){
 
 Stmt* Parser::assign(){
     const Id* id = new Id((Word*)lookahead);
-    Stmt* equation = nullptr;
+    Stmt* equation = &Stmt::Null;
     match(Tag::ID);
     if (lookahead->tag == '['){
         const Expr* ix = offset(id);
-        match('=');
+        move();
         const Expr* expr = bools();
         equation = new SetElem(id, ix, expr);
     }
-    else {
-        match('=');
+    else if (lookahead->tag == '='){
+        move();
         const Expr* expr = bools();
         equation = new Set(id, expr);
     }

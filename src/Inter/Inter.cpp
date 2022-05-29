@@ -345,7 +345,7 @@ If::If(const Expr* e, Stmt* s): expr(e), stmt(s){
 */
 void If::gen(int begin, int after){
     int label = newLabel();
-    expr->jump(0, label);
+    expr->jump(0, after);
     printLabel(label);
     stmt->gen(label, after);
 }
@@ -359,8 +359,9 @@ expr(e), stmt1(s1), stmt2(s2){
 }
 
 
-/*  begin:  If False expr goto label2    
-    label1: Stmt(entry: label1, exit: label2)
+/*  begin:  If False expr goto label2
+    label1: Stmt(entry: label1, exit: after)
+            goto after
     label2: Stmt(entry: label2, exit: after)
 */
 void Else::gen(int begin, int after){
@@ -368,7 +369,8 @@ void Else::gen(int begin, int after){
     int label2 = newLabel();
     expr->jump(0, label2);
     printLabel(label1);
-    stmt1->gen(label1, label2);
+    stmt1->gen(label1, after);
+    print(string("goto ") + "L" + to_string(after));
     printLabel(label2);
     stmt2->gen(label2, after);
 }
@@ -430,5 +432,5 @@ Break::Break(){
 
 
 void Break::gen(int begin, int after){
-    print(string("goto L") + to_string(after));
+    print(string("goto L") + to_string(stmt->getsavedAfter()));
 }
