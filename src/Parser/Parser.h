@@ -3,7 +3,6 @@
 #include "../Lexer/Lexer.h"
 #include "../Inter/Inter.h"
 #include <iostream>
-using namespace std;
 
 class Parser{
 private:

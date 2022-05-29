@@ -14,8 +14,6 @@ int Node::labels = 0;
 
 Print* Node::p = new Print(cout);
 
-Node::Node(int l): lexline(l){}
-
 void Node::setOutput(ostream& o){
     delete p;
     p = new Print(o);
@@ -38,8 +36,12 @@ void Node::printLabel(int l){
 
 /* 打印字符串并换行 */
 void Node::print(string s){
-    p->output << "\t" << s << endl;
+    p->output << "\t\t" << s << endl;
 } 
+
+void Node::printLine(int l){
+    p->output << "\t" << l << endl;
+}
 
 /* -------------- Expr实现部分 ---------------*/
 
@@ -284,12 +286,18 @@ void Cmp::jump(int t, int f)const {
 
 /* --------------------- Stmt的实现 ------------------------ */
 
+Stmt::Stmt(int l): lexline(l){}
+
 Stmt Stmt::Null = Stmt();
+
 Stmt* Stmt::Enclosure = &Stmt::Null;
 
 /* ---------------------- Set的实现 -------------------------- */
 
 Set::Set(const Id* i, const Expr* e): id(i), expr(e){}
+
+Set::Set(const Id* i, const Expr* e, int l): id(i), expr(e), Stmt(l){}
+
 
 void Set::gen(int b, int a){
     const Expr* e = expr->gen();
@@ -302,6 +310,8 @@ void Set::gen(int b, int a){
 SetElem::SetElem(const Id* i, const Expr* e1, const Expr* e2):
 array(i), index(e1), expr(e2){}
 
+SetElem::SetElem(const Id* i, const Expr* e1, const Expr* e2, int l):
+array(i), index(e1), expr(e2), Stmt(l){}
 
 void SetElem::gen(int b, int a){
     const Expr* ix = index->reduce();
@@ -314,16 +324,30 @@ void SetElem::gen(int b, int a){
 
 /* ------------------------ Seq的实现 --------------------------- */
 
-Seq::Seq(Stmt* s1, Stmt* s2): stmt1(s1), stmt2(s2){}
+Seq::Seq(Stmt* s1, Stmt* s2): stmt1(s1), stmt2(s2){
+    if(s1 != &Stmt::Null)
+        lexline = s1->getLextline();
+    else if (s2 != &Stmt::Null)
+        lexline = s2->getLextline();
+}
+
+Seq::Seq(Stmt* s1, Stmt* s2, int l): stmt1(s1), stmt2(s2), Stmt(l){}
+
+
 
 /* 一个语句块生成一个Label */
 void Seq::gen(int b, int a){
-    if (stmt1 == &Stmt::Null) 
+    if (stmt1 == &Stmt::Null){
+        printLine(lexline);
         stmt2->gen(b, a);
-    else if (stmt2 == &Stmt::Null)
+    }
+    else if (stmt2 == &Stmt::Null){
+        printLine(lexline);
         stmt1->gen(b, a);
+    }
     else {
         int label = newLabel();
+        printLine(lexline);
         stmt1->gen(b, label);
         printLabel(label);
         stmt2->gen(label, a);
@@ -333,6 +357,11 @@ void Seq::gen(int b, int a){
 /* --------------------- If的实现 ---------------------- */
 
 If::If(const Expr* e, Stmt* s): expr(e), stmt(s){
+    if (!Type::isBool(e->type))
+        error("Need Bool in If");
+}
+
+If::If(const Expr* e, Stmt* s, int l): expr(e), stmt(s), Stmt(l){
     if (!Type::isBool(e->type))
         error("Need Bool in If");
 }
@@ -354,6 +383,12 @@ void If::gen(int begin, int after){
 
 Else::Else(const Expr* e, Stmt* s1, Stmt* s2):
 expr(e), stmt1(s1), stmt2(s2){
+    if (!Type::isBool(e->type))
+        error("Need Bool in IF-Else");
+}
+
+Else::Else(const Expr* e, Stmt* s1, Stmt* s2, int l):
+expr(e), stmt1(s1), stmt2(s2), Stmt(l){
     if (!Type::isBool(e->type))
         error("Need Bool in IF-Else");
 }
@@ -385,6 +420,15 @@ void While::init(const Expr* e, Stmt* s){
     stmt = s;
 }
 
+void While::init(const Expr* e, Stmt* s, int l){
+    if (!Type::isBool(e->type))
+        error("Need Bool in While");
+    expr = e;
+    stmt = s;
+    lexline = l;
+}
+
+
 /*  
     begin:  If False expr goto after
     label:  Stmt(entry: label, exit: begin)
@@ -411,6 +455,14 @@ void Do::init(const Expr* e, Stmt* s){
     stmt = s;
 }
 
+void Do::init(const Expr* e, Stmt* s, int l){
+    if (!Type::isBool(e->type))
+        error("Need Bool in While");
+    expr = e;
+    stmt = s;
+    lexline = l;
+}
+
 /*  begin:  Stmt(entry: begin, exit: label)
     label:  if expr goto begin else goto after
 */
@@ -432,6 +484,12 @@ Break::Break(){
     stmt = Stmt::Enclosure;
 }
 
+Break::Break(int l){
+    if(Stmt::Enclosure == &Stmt::Null)
+        error("Not Enclosed");
+    stmt = Stmt::Enclosure;
+    lexline = l;
+}
 
 void Break::gen(int begin, int after){
     print(string("goto L") + to_string(stmt->getsavedAfter()));

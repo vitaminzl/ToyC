@@ -3,7 +3,6 @@
 #include "../Lexer/Lexer.h"
 #include <string>
 #include <iostream>
-// using namespace std;
 using std::ostream;
 using std::string;
 using std::cout;
@@ -17,17 +16,16 @@ public:
 
 class Node{
 protected:
-    int lexline = 0;
     static Print* p;
     static int labels;
 public:
     Node(){}
-    Node(int);
     ~Node(){}
     static int newLabel();
     static void error(string s);
     static void setOutput(ostream& o);
     static void printLabel(int);
+    static void printLine(int);
     static void print(string s);
 };
 
@@ -147,12 +145,15 @@ public:
 
 class Stmt: public Node{
 protected:
+    int lexline = 0;
     int savedAfter = 0;
 public:
     static Stmt Null;
     static Stmt* Enclosure;
     Stmt(){}
+    Stmt(int );
     int getsavedAfter(){ return savedAfter; }
+    int getLextline(){ return lexline; }
     virtual void gen(int b, int a){}
 };
 
@@ -161,6 +162,7 @@ public:
     const Id* id;
     const Expr* expr;
     Set(const Id* ,const Expr* );
+    Set(const Id* ,const Expr* , int );
     virtual Type* check(Type*, Type*){}
     virtual void gen(int b, int a);
 };
@@ -172,15 +174,20 @@ public:
     const Expr* index;
     const Expr* expr;
     SetElem(const Id* , const Expr* , const Expr*);
+    SetElem(const Id* , const Expr* , const Expr*, int );
     virtual Type* check(Type*, Type*){}
     virtual void gen(int b, int a);
 };
 
 class Seq: public Stmt{
+private:
+    int line1 = 0;
+    int line2 = 0;
 public:
     Stmt* stmt1;
     Stmt* stmt2;
     Seq(Stmt* , Stmt* );
+    Seq(Stmt* , Stmt* , int);
     virtual void gen(int b, int a);
 };
 
@@ -189,6 +196,7 @@ public:
     const Expr* expr;
     Stmt* stmt;
     If(const Expr* , Stmt* );
+    If(const Expr* , Stmt* , int );
     virtual void gen(int b, int a);
 };
 
@@ -198,6 +206,7 @@ public:
     Stmt* stmt1;
     Stmt* stmt2;
     Else(const Expr* , Stmt* , Stmt* );
+    Else(const Expr* , Stmt* , Stmt* , int );
     virtual void gen(int b, int a);
 };
 
@@ -207,6 +216,7 @@ public:
     Stmt* stmt;
     While():expr(nullptr), stmt(nullptr){}
     void init(const Expr* , Stmt*);
+    void init(const Expr* , Stmt*, int );
     virtual void gen(int b, int a);
 };
 
@@ -216,6 +226,7 @@ public:
     Stmt* stmt;
     Do(): expr(nullptr), stmt(nullptr){}
     void init(const Expr* , Stmt* );
+    void init(const Expr* , Stmt* , int );
     virtual void gen(int b, int a);
 };
 
@@ -223,6 +234,7 @@ class Break: public Stmt{
 public:
     Stmt* stmt;
     Break();
+    Break(int l);
     virtual void gen(int b, int a);
 };
 

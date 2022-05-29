@@ -1,34 +1,9 @@
-// PROGRAM -> STMTS
-// STMTS	-> STMTS STMT
-//     	-> eps
-// STMT	-> ASSIGN';'
-// ASSIGN  -> id OFFSET = BOOL
-// BOOL	-> BOOL "||" JOIN
-//         -> JOIN
-// JOIN	-> JOIN "&&" EQAULITY
-//         -> EQUALITY
-// EQUALITY-> EQUALITY "==" CMP
-//         -> EQUALITY "!=" CMP
-//         -> CMP
-// CMP	-> EXPR < EXPR
-//         -> EXPR <= EXPR
-//         -> EXPR >= EXPR
-//         -> EXPR > EXPR
-// EXPR	-> EXPR + TERM
-//         -> EXPR - TERM
-//         -> TERM
-// TERM	-> TERM * UNARY
-//         -> TERM / UNARY
-//         -> UNARY
-// UNARY	-> '!' UNARY
-//         -> '-' UNARY
-//         -> FACTOR
-// FACTOR	-> ( BOOL )
-//         -> LOC
-//         -> number
-//         -> real
-
 #include "Parser.h"
+#include <iostream>
+#include <string>
+using std::string;
+using std::endl;
+using std::to_string;
 
 /* 初始化记得move一下 */
 Parser::Parser(Lexer& l, ostream& o):lex(l), output(o){
@@ -92,6 +67,7 @@ Stmt* Parser::stmt(){
     Stmt* savedStmt = nullptr;
     switch(lookahead->tag){
         case Tag::IF: {
+            int line = lex.getLine();
             move();
             match('(');
             const Expr* e = bools();
@@ -99,12 +75,13 @@ Stmt* Parser::stmt(){
             Stmt* s = stmt();
             if (lookahead->tag == Tag::ELSE){
                 move();
-                return new Else(e, s, stmt());
+                return new Else(e, s, stmt(), line);
             }
             else 
-                return new If(e, s);
+                return new If(e, s, line);
         }
         case Tag::WHILE: {
+            int line = lex.getLine();
             move();
             While* wNode = new While();
             savedStmt = Stmt::Enclosure;
@@ -112,7 +89,7 @@ Stmt* Parser::stmt(){
             match('(');
             const Expr* e = bools();
             match(')');
-            wNode->init(e, stmt());
+            wNode->init(e, stmt(), line);
             Stmt::Enclosure = savedStmt;
             return wNode;
         }
@@ -123,19 +100,21 @@ Stmt* Parser::stmt(){
             Stmt::Enclosure = dNode;
             // match(Tag::DO);
             Stmt* s = stmt();
+            int line = lex.getLine();
             match(Tag::WHILE);
             match('(');
             const Expr* e = bools();
             match(')');
             match(';');
-            dNode->init(e, s);            
+            dNode->init(e, s, line);            
             Stmt::Enclosure = savedStmt;
             return dNode;
         }
         case Tag::BREAK: {
+            int line = lex.getLine();
             move();
             match(';');
-            return new Break();
+            return new Break(line);
         }
         case '{':
             return block();
@@ -154,12 +133,12 @@ Stmt* Parser::assign(){
         const Expr* ix = offset(id);
         move();
         const Expr* expr = bools();
-        equation = new SetElem(id, ix, expr);
+        equation = new SetElem(id, ix, expr, lex.getLine());
     }
     else if (lookahead->tag == '='){
         move();
         const Expr* expr = bools();
-        equation = new Set(id, expr);
+        equation = new Set(id, expr, lex.getLine());
     }
     match(';');
     return equation;

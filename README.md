@@ -352,8 +352,26 @@ CMP	-> EXPR < EXPR
 
 输入
 ``` txt
-
-
+{
+    if ((a + c) > (b * 2 - 1) || a < b && c){
+        a = b * 2 - c + (b + 2 * d);
+    }
+    while (a > 3){
+        a = a + 1;
+        do a = a + 3; while( b > 2);
+        if (c - 3){
+            b = c + 5;
+            d = a + 3;
+        }
+        else {
+            c = 3;
+            break;
+        }
+    }
+    while (c < b){
+        a = 3;
+    }
+}
 ```
 
 
@@ -372,18 +390,21 @@ L5:L4:	t4 = b * 2
 	t6 = 2 * d
 	t7 = b + t6
 	a = t5 + t7
-L3:	if a > 3 goto L6
-	goto L2
-L6:	a = a + 1
-L7:	a = a + 3
-L9:	if b > 2 goto L7
-	goto L8
-L8:	if False c - 3 goto L11
-L10:	b = c + 5
-L12:	d = a + 3
+L3:	if False a > 3 goto L6
+L7:	a = a + 1
+L8:	a = a + 3
+L10:	if b > 2 goto L8
+	goto L9
+L9:	if False c - 3 goto L12
+L11:	b = c + 5
+L13:	d = a + 3
 	goto L3
-L11:	c = 3
-L13:	goto L2
+L12:	c = 3
+L14:	goto L6
+	goto L3
+L6:	if False c < b goto L2
+L15:	a = 3
+	goto L6
 L2:
 
 ```
