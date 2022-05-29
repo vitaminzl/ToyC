@@ -316,8 +316,7 @@ L2:
 ```
 
 
-
-#### 跳转语句的中间代码
+#### 控制流语句的中间代码
 ``` c++
 PROGRAM -> BLOCK
 BLOCK 	-> '{' STMTS '}'
@@ -346,6 +345,46 @@ CMP	-> EXPR < EXPR
         -> EXPR <= EXPR
         -> EXPR >= EXPR
         -> EXPR > EXPR
+
+```
+
+
+
+输入
+``` txt
+
+
+```
+
+
+
+输出
+```
+L1:	t1 = a + c
+	t2 = b * 2
+	t3 = t2 - 1
+	if t1 > t3 goto L5
+	if False a < b goto L3
+	if c goto L5
+	goto L3
+L5:L4:	t4 = b * 2
+	t5 = t4 - c
+	t6 = 2 * d
+	t7 = b + t6
+	a = t5 + t7
+L3:	if a > 3 goto L6
+	goto L2
+L6:	a = a + 1
+L7:	a = a + 3
+L9:	if b > 2 goto L7
+	goto L8
+L8:	if False c - 3 goto L11
+L10:	b = c + 5
+L12:	d = a + 3
+	goto L3
+L11:	c = 3
+L13:	goto L2
+L2:
 
 ```
 

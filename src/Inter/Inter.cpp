@@ -370,7 +370,7 @@ void Else::gen(int begin, int after){
     expr->jump(0, label2);
     printLabel(label1);
     stmt1->gen(label1, after);
-    print(string("goto ") + "L" + to_string(after));
+    print(string("goto L") + to_string(after));
     printLabel(label2);
     stmt2->gen(label2, after);
 }
@@ -385,19 +385,21 @@ void While::init(const Expr* e, Stmt* s){
     stmt = s;
 }
 
-/*  begin:  If expr goto label  else goto after
-    label:  Stmt(entry: label, exit: begin)
-    ------------
+/*  
     begin:  If False expr goto after
     label:  Stmt(entry: label, exit: begin)
-            goto label
+            goto begin
+    ----- 以下是错误的，有可能接下来的语句是表达式，其可以不带跳转 ------
+    begin:  If expr goto label  else goto after
+    label:  Stmt(entry: label, exit: begin)
 */
 void While::gen(int begin, int after){
     int label = newLabel();
     savedAfter = after;
-    expr->jump(label, after);
+    expr->jump(0, after);
     printLabel(label);
     stmt->gen(label, begin);
+    print(string("goto L") + to_string(begin));
 }
 
 /* ------------------- Do的实现 ---------------------- */

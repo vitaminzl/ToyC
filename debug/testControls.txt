@@ -14,4 +14,7 @@
             break;
         }
     }
+    while (c < b){
+        a = 3;
+    }
 }
