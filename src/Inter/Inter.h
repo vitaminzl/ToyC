@@ -1,11 +1,14 @@
 #ifndef INTER
 #define INTER
-#include "../Lexer/Lexer.h"
 #include <string>
+#include <map>
+#include "../Lexer/Lexer.h"
 using std::string;
+using namespace std;
+/*抽象语法树中的结点*/
 class Node{
 protected:
-    int lexline = 0;
+    int lexline = 0;             //源程序中的行号
 public:
     static const int labels;
     Node(int);
@@ -16,12 +19,13 @@ public:
     void print(string s);
 };
 
+/*表达式类：Node的子类*/
 class Expr: public Node{
 public: 
-    Token* Op;
-    Type* type;
+    Token* Op;                    //结点上的运算符
+    Type* type;                   //结点上的类型
     Expr(Token*, Type*);
-    virtual ~Expr();
+    ~Expr();
     void printJumps();
     virtual Expr* gen();
     virtual Expr* reduce();
@@ -29,39 +33,29 @@ public:
     virtual string tostring();
 };
 
+/*标识符类：Expr的子类
+对应于一个标识符的类Id的结点是一个叶子结点*/
 class Id: public Expr{
 private:
-    int offset;
+    int offset;                         //标识符的相对地址
 public:
     Id(Word* id, Type* p, int b);
+    ~Id();
     int getOffset();
 };
 
-class Op: public Expr{
 
-};
-
-
-class Constant: public Expr{
-public:
-    static const Constant True;
-    static const Constant False;
-    Constant(Token* tok, Type* p);
-    Constant(int i);
-    ~Constant();
-    virtual void jump();
-};
 
 /* 符号表 */
-class Scope: public Type{
+class Scope{
 private:
-    map<Token*, Id*> table;
+    map<const Token*, Id*> table;
     Scope* prev;
 public:
     Scope(Scope* n);
     ~Scope();
-    void put(Token* , Id*);
-    Id* get(Token*);
+    void put(const Token*, Id*);
+    Id* get(const Token*);
 };
 
 

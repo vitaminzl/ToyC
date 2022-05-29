@@ -14,7 +14,7 @@ enum Tag{
     OR,         NE,         EQ,         LE,
     GE,         BASIC,      NUM,        REAL,
     ID,         TEMP,       INDEX,      MINUS,
-    ERR
+    ERR,        SCOPE
 };
 
 /* Token基类 */
@@ -92,6 +92,7 @@ public:
     virtual string toString() const;    // 将token转化为String类型
 };
 
+/*类型类*/
 class Type: public Word{
 public:
     const int width;                    // 变量所占字节数
@@ -106,15 +107,17 @@ public:
     virtual string toString() const;     // 将token转化为String类型
 };
 
+/*数组类*/
 class Array: public Type{
 public:
     Type type;
     int size = 1;
-    Array(int sz,Type p);
+    Array(int sz,Type* p);
     ~Array();
     virtual string toString() const;
 };
 
+/*词法分析器类*/
 class Lexer{
 private:
     //记录当前行号
@@ -131,6 +134,7 @@ public:
     Lexer(istream& in);
     ~Lexer();
     char* readch();
+    int getline() {return line;}
     bool readch(char c);
     bool isEOF();
     const Token* scan();

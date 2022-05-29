@@ -71,10 +71,10 @@ const Type Type::Bool = Type(string("bool"), Tag::BASIC, 1);
 const Type Type::Char = Type(string("char"), Tag::BASIC, 1);
 //函数：判断是否是基本型
 bool Type::isBool(Type* t) const{
-    if (t == &Type::Int || t == &Type::Float || t == &Type::Bool || t == &Type::Char)
-        return true;
-    else
+    if (t == &Type::Int || t == &Type::Float || t == &Type::Char)
         return false;
+    else
+        return true;
 }
 //函数：判断转换成的类型
 const Type* Type::max(Type* ta, Type* tb) const {
@@ -92,7 +92,7 @@ string Type::toString() const {
 }
 
 /* Array类的实现 */
-Array::Array(int sz,Type p) : Type(string(""), Tag::INDEX, sz*p.width), size(sz),type(p) {}
+Array::Array(int sz,Type* p) : Type(string(""), Tag::INDEX, sz*p->width), size(sz),type(*p) {}
 Array::~Array() {}
 string Array::toString() const {
     return (string("[")+std::to_string(size)+string("]")+type.toString());
