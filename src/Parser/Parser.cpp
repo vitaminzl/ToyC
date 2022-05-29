@@ -12,7 +12,7 @@ Parser::Parser(Lexer& l, ostream& o):lex(l), output(o){
 }
 
 void Parser::error(string s){ 
-    throw string("near Line") + to_string(lex.getLine()) + s; 
+    throw string("near Line") + to_string(lex.getLine()) + string(": ") + s; 
 }
 
 void Parser::move(){
