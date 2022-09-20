@@ -1,19 +1,24 @@
-#include "test.h"
+#include "Test.h"
 #include <fstream>
 #include <iostream>
-using std::cout;
-using std::endl;
+using namespace std;
 
-void testScan(){
-    std::ifstream input("test.txt");
+
+
+/* 开发阶段模块3测试函数，请勿使用在最终成品上 */
+void Test::testExpr() {
+    ifstream input("testExpr.txt");
+    ofstream output("testExpr-intercode.txt");
     Lexer lexer(input);
-    while(!lexer.isEOF()){
-        Token* tok = lexer.scan();
-        cout << tok->tag << "    ";
-        cout << tok->toString() << endl;
-    }
+    Parser parser(lexer, output);
+    parser.program();
 }
 
-void testSymbol(){
-    
+/* 开发阶段模块4测试函数，请勿使用在最终成品上 */
+void Test::testControls() {
+    ifstream input("testControls.txt");
+    ofstream output("testControls-intercode.txt");
+    Lexer lexer(input);
+    Parser parser(lexer, output);
+    parser.program();
 }

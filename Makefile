@@ -28,6 +28,6 @@ run : debug
 	@(cd debug && ./compiler)
 # 清除所有目标文件、可执行文件
 clean : 
-	(rm -rf debug build)
+	(rm -rf debug/compiler* build)
 # 伪目标，避免因为run、debug、clean存在而不执行该命令
 .PHONY : run debug clean

@@ -1,0 +1,20 @@
+{
+    if ((a + c) > (b * 2 - 1) || a < b && c){
+        a = b * 2 - c + (b + 2 * d);
+    }
+    while (a > 3){
+        a = a + 1;
+        do a = a + 3; while( b > 2);
+        if (c - 3){
+            b = c + 5;
+            d = a + 3;
+        }
+        else {
+            c = 3;
+            break;
+        }
+    }
+    while (c < b){
+        a = 3;
+    }
+}
