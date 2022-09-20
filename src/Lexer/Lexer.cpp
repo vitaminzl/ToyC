@@ -106,6 +106,13 @@ string Array::toString() const {
     return (string("[")+std::to_string(size)+string("]")+next->toString());
 }
 
+string Array::getBasicType(){
+    const Type* tp = next;
+    if (tp->tag != Tag::BASIC)
+        tp = ((Array* )tp)->next;
+    return tp->toString();
+}
+
 /* Lexer类的实现 */
 Lexer::Lexer(istream& in):input(in) {
     reserve(new Word("if", Tag::IF));

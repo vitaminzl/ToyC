@@ -113,6 +113,7 @@ public:
     Array(int sz, const Type* p);
     ~Array();
     virtual string toString() const;
+    string getBasicType();
 };
 
 class Lexer{

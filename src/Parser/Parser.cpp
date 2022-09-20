@@ -68,7 +68,15 @@ void Parser::decls() {
 		Type* p = type();
         // cout << lookahead->toString() << p->toString() << p->tag << endl;
 		const Token* tok = lookahead;
-		Word* w = new Word(((Word*)lookahead)->value, lookahead->tag);
+        string s;
+        if(p->tag == Tag::INDEX){
+            s = ((Array*)p)->getBasicType();
+        }
+        else{
+            s = p->toString();
+        }
+        string st = s + string("(") + to_string(used) + string(")");
+		Word* w = new Word(st, lookahead->tag);
 		match(Tag::ID);
 		match(';');
 		Id* id = new Id(w, p, used);
