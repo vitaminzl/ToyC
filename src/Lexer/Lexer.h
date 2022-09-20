@@ -116,15 +116,6 @@ public:
     string getBasicType();
 };
 
-class Array: public Type{
-public:
-    Type type;
-    int size;
-    Array();
-    ~Array();
-    virtual string toString();
-};
-
 class Lexer{
 private:
     //记录当前行号
